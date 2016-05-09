@@ -42,7 +42,7 @@ export default class Main extends React.Component {
     if(this.map !== null){
       const {event} = daum.maps;
       const map = this.map;
-      event.addListener(map, 'bounds_changed', () => {
+      event.addListener(map, 'dragend', () => {
         console.log(map.getBounds());
       });
 
