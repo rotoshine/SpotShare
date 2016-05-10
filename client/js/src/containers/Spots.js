@@ -1,28 +1,32 @@
 import React from 'react';
 import $ from 'jquery';
+import {Button} from 'react-bootstrap';
 
 import App from '../App';
-export default class Main extends React.Component {
+export default class Spots extends React.Component {
   state = {
     // dummy spots
     spots: [
       {
         spotName: '천호동 스팟',
         address: '서울 강동구 천호동 481-5',
-        lat: 37.54251441506003,
-        lng: 127.11770256831429,
+        geo: [37.54251441506003, 127.11770256831429],
         createdDate: new Date(),
         updatedDate: new Date(),
         description: '어쩌구 저저구 시불시불~~'
       }
     ],
-    height: $(window).height() - 86
+    height: 0
   };
 
   componentDidMount () {
-    this.createMap();
-    this.registEvents();
-    this.fetchSpots();
+    this.setState({
+      height: $(window).height() - $('.nav').height() - 2
+    }, () => {
+      this.createMap();
+      this.registEvents();
+      this.fetchSpots();
+    });
   }
 
   createMap(){
@@ -49,31 +53,56 @@ export default class Main extends React.Component {
       event.addListener(map, 'tilesloaded', () => {
         console.log('tileload!', map.getBounds());
       });
+
+      event.addListener(map, 'click', (mouseEvent) => {
+        let latLng = mouseEvent.latLng;
+          this.createSpot(latLng);
+      });
     }
+  }
+
+  createSpot(latLng) {
+    let {spots} = this.state;
+    spots.push({
+      spotName: 'test',
+      geo: [latLng.getLat(), latLng.getLng()]
+    });
+
+    this.setState({
+      spots: spots
+    }, () => {
+      this.fetchSpots();
+    })
   }
 
   fetchSpots () {
     // ajax fake~
-
     this.markers = [];
 
     const {spots} = this.state;
 
     spots.forEach(spot => {
       let marker = new daum.maps.Marker({
-        position: new daum.maps.LatLng(spot.lat, spot.lng)
+        position: new daum.maps.LatLng(spot.geo[0], spot.geo[1])
       });
 
       marker.setMap(this.map);
       this.markers.push(marker);
     });
+
+    console.log(this.markers);
   }
 
   render() {
     let style = { width: '100%', height: this.state.height };
     return (
       <App>
-        <div id="spot-map" style={style}></div>
+        <div className="map-wrapper">
+          <div className="map" id="spot-map" style={style}></div>
+          <div className="map-control">
+            <Button bsStyle="info">등록</Button>
+          </div>
+        </div>
       </App>
     );
   }

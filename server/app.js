@@ -24,6 +24,11 @@ if(argv.dev){
   }));
 }
 
+// mongoose connect
+
+// api loading
+app.use('/api', require('./api/spot'));
+
 const CLIENT_PATH = path.resolve(`${__dirname}`, '../client');
 app.use(express.static(CLIENT_PATH));
 app.get('', (req, res) => {

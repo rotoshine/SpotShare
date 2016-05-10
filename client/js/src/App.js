@@ -1,5 +1,9 @@
 import React, {PropTypes} from 'react';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
+
+/**
+ * App Component
+ */
 export default class App extends React.Component {
   static propTypes = {
     children: PropTypes.oneOfType([PropTypes.element, PropTypes.array]).isRequired
@@ -7,8 +11,8 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <section>
-        <Navbar inverse>
+      <section style={{width: '100%', height: '100%'}}>
+        <Navbar style={{marginBottom:0}} inverse>
           <Navbar.Header>
             <Navbar.Brand>
               <a href="#">Board Spot!</a>
@@ -17,7 +21,7 @@ export default class App extends React.Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav>
-              <NavItem eventKey={1} href="#">Spot List</NavItem>
+              <NavItem eventKey={1} href="#">Spot Map</NavItem>
             </Nav>
             <Nav pullRight>
               <NavItem eventKey={1} href="#">Login</NavItem>
