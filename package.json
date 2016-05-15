@@ -48,9 +48,11 @@
     "minimist": "^1.2.0",
     "mongoose": "^4.4.15",
     "passport": "^0.3.2",
+    "passport-facebook": "^2.1.0",
     "react": "^15.0.0",
     "react-bootstrap": "^0.29.3",
     "react-dom": "^15.0.0",
+    "react-hammerjs": "^0.4.6",
     "react-router": "^2.4.0"
   }
 }
