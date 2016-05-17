@@ -3,6 +3,10 @@ html, body, .root {
   height: 100%;
 }
 
+.map-wrapper{
+  overflow:hidden;
+}
+
 .map-wrapper, .map-wrapper .map{
   position:relative;
 }

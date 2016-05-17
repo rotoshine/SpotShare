@@ -1,3 +1,5 @@
+'use strict';
+
 require('dotenv').config();
 const config = require('./config');
 const glob = require('glob');
@@ -5,6 +7,7 @@ const _ = require('lodash');
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const exphbs = require('express-handlebars');
 const app = express();
 const bodyParser = require('body-parser');
 const webpackMiddleware = require('webpack-dev-middleware');
@@ -48,6 +51,21 @@ if(_.isArray(modelPaths)){
   console.log('model loading done.');
 }
 
+// auth config
+const passport = require('passport');
+require('./auth/passport')(passport, config);
+app.get('/auth/facebook/login', passport.authenticate('facebook', {
+  session: false,
+  scope: ['public_profile', 'user_about_me', 'user_location']
+}));
+app.get('/auth/facebook/login/callback', passport.authenticate('facebook', {
+  session: false,
+  successRedirect: '/'
+}));
+app.get('/api/me', passport.authenticate('facebook', { session: false}), (req, res) => {
+  res.json(req.user);
+});
+
 // api loading
 const apiPaths = glob.sync(`${__dirname}/api/**/index.js`);
 if(_.isArray(apiPaths)){
@@ -59,11 +77,20 @@ if(_.isArray(apiPaths)){
   console.log('api loading done.');
 }
 
+// client setting
 const CLIENT_PATH = path.resolve(`${__dirname}`, '../client');
 app.use(express.static(CLIENT_PATH));
+
+// view engine
+app.engine('handlebars', exphbs());
+app.set('views', `${__dirname}/views`);
+app.set('view engine', 'handlebars');
+
 app.get('', (req, res) => {
-  console.log('!');
-  return res.sendFile(`${CLIENT_PATH}/html/index.html`);
+  return res.render('index', {
+    title: config.title,
+    daumMapApiKey: config.daumMapApiKey
+  });
 });
 
 app.listen(process.env.PORT);

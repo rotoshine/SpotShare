@@ -2,7 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import Hammer from 'react-hammerjs';
-import {Button, Well, Panel, Form, FormGroup, FormControl, Col, ControlLabel, Modal} from 'react-bootstrap';
+import {Button, Well, Panel, Form, FormGroup, FormControl, Input, Col, ControlLabel, Modal} from 'react-bootstrap';
 
 import App from '../App';
 export default class Spots extends React.Component {
@@ -21,7 +21,7 @@ export default class Spots extends React.Component {
 
   componentDidMount() {
     this.setState({
-      height: $(window).height() - $('.nav').height() - 2
+      height: $(window).height() - $('.navbar').height() - 2
     }, () => {
       this.createMap();
       this.registEvents();
@@ -49,9 +49,8 @@ export default class Spots extends React.Component {
       event.addListener(map, 'dragend', () => {
         this.fetchSpots();
       });
-
-      event.addListener(map, 'tilesloaded', () => {
-        console.log('tileload!', map.getBounds());
+      event.addListener(map, 'zoom_changed', () => {
+        this.fetchSpots();
       });
     }
   }
@@ -136,17 +135,25 @@ export default class Spots extends React.Component {
   render() {
     let style = {width: '100%', height: this.state.height};
 
-    let spots = [];
+    let spotListComponents = [];
 
-    _.map(this.state.spots, (spot, i) => {
-      spots.push(
-        <li key={i} onClick={this.handleSpotListClick.bind(this, spot)}>
-          {spot.spotName}
-        </li>
-      )
-    });
+    const {spots} = this.state;
 
-    let panelHeader = <h3>Spot List</h3>;
+    if(_.isArray(spots)){
+      spots.forEach((spot, i) => {
+        spotListComponents.push(
+          <li key={i}>
+            <a href="#" onClick={this.handleSpotListClick.bind(this, spot)}>{spot.spotName}</a>
+          </li>
+        );
+      });
+
+      if(spotListComponents.length === 0){
+        spotListComponents.push(
+          <li key="empty">이 지역엔 공유된 스팟이 없습니다.</li>
+        )
+      }
+    }
 
     let {spotName, address, description} = this.state.addModals;
 
@@ -180,14 +187,14 @@ export default class Spots extends React.Component {
                                onChange={this.handleFormChange.bind(this, 'description')}/>
                 </Col>
               </FormGroup>
-              <FormGroup controlId="address">
-                <Col componentClass={ControlLabel} sm={2}>
+              <div className="form-group">
+                <label htmlFor="address" className="col-sm-2 col-xs-6 control-label">
                   주소
-                </Col>
+                </label>
                 <Col sm={10}>
-                  <FormControl type="text" value={address} readOnly/>
+                  <input id="address" type="text" value={address} className="form-control" readOnly/>
                 </Col>
-              </FormGroup>
+              </div>
 
               <FormGroup>
                 <Col smOffset={2} sm={10}>
@@ -202,12 +209,13 @@ export default class Spots extends React.Component {
         <Hammer onPress={this.handlePress}>
           <div className="map-wrapper">
             <div className="map" id="spot-map" style={style}></div>
-            <div className="map-control">
+            <div className="map-control col-md-4 hidden-xs">
               <Well>스팟을 등록하려면 해당 위치를 길게 누르세요.</Well>
-              <Panel header={panelHeader}>
+              <Panel>
                 <ul className="list-unstyled">
-                  {spots}
+                  {spotListComponents}
                 </ul>
+                <Button size="xs" onClick={this.handleCurrentPositionClick}>현재 위치 찾기</Button>
               </Panel>
             </div>
           </div>
@@ -217,6 +225,7 @@ export default class Spots extends React.Component {
   }
 
   handlePress = (e) => {
+    // getting pressed position
     const proj = this.map.getProjection();
     const {x, y} = e.pointers[0];
     const point = new daum.maps.Point(x, y - $('.navbar').height());
@@ -224,6 +233,7 @@ export default class Spots extends React.Component {
     const latLng = proj.coordsFromContainerPoint(point);
     const geocoder = new daum.maps.services.Geocoder();
 
+    // getting pressed positions address
     return geocoder.coord2detailaddr(latLng, (status, result) => {
       if (status === daum.maps.services.Status.OK) {
         let address = result[0].roadAddress.name;
@@ -269,10 +279,25 @@ export default class Spots extends React.Component {
   handleSpotFormSubmit = (e) => {
     e.preventDefault();
     this.createSpot();
+    this.handleModalClose();
   };
 
-  handleSpotListClick = (spot) => {
+  handleSpotListClick = (spot, e) => {
+    e.preventDefault();
     this.map.setCenter(new daum.maps.LatLng(spot.geo[0], spot.geo[1]));
   };
+
+  handleCurrentPositionClick = (e) => {
+    e.preventDefault();
+    // geolocation 사용이 가능한 경우
+    if('geolocation' in navigator){
+      navigator.geolocation.getCurrentPosition((position) => {
+        const {latitude, longitude} = position.coords;
+        this.map.setCenter(new daum.maps.LatLng(latitude, longitude));
+      });
+    }else{
+      alert('현재 브라우저에선 지원하지 않는 기능입니다.');
+    }
+  }
 
 }

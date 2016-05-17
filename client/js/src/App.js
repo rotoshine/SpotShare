@@ -24,7 +24,7 @@ export default class App extends React.Component {
               <NavItem eventKey={1} href="#">Spot Map</NavItem>
             </Nav>
             <Nav pullRight>
-              <NavItem eventKey={1} href="#">Login</NavItem>
+              <NavItem eventKey={1} href="/auth/facebook/login">Login</NavItem>
             </Nav>
           </Navbar.Collapse>
         </Navbar>
