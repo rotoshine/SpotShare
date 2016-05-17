@@ -38,6 +38,7 @@
     "webpack-hot-middleware": "^2.10.0"
   },
   "dependencies": {
+    "body-parser": "^1.15.1",
     "bootstrap": "^3.3.6",
     "bootstrap-material-design": "^0.5.9",
     "dotenv": "^2.0.0",

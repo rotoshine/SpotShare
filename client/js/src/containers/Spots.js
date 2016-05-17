@@ -12,6 +12,7 @@ export default class Spots extends React.Component {
       visibleModal: false,
       spotName: null,
       address: null,
+      description: null,
       latLng: null
     },
     spots: [],
@@ -24,7 +25,6 @@ export default class Spots extends React.Component {
     }, () => {
       this.createMap();
       this.registEvents();
-      this.fetchSpots();
     });
   }
 
@@ -38,15 +38,16 @@ export default class Spots extends React.Component {
 
     this.map = new daum.maps.Map(container, options);
     this.markers = [];
+
+    this.fetchSpots();
   }
 
   registEvents() {
-
     if (this.map !== null) {
       const {event} = daum.maps;
       const map = this.map;
       event.addListener(map, 'dragend', () => {
-        console.log(map.getBounds());
+        this.fetchSpots();
       });
 
       event.addListener(map, 'tilesloaded', () => {
@@ -57,27 +58,44 @@ export default class Spots extends React.Component {
 
   createSpot() {
     let {spots} = this.state;
-    let {spotName, address, latLng} = this.state.addModals;
-    spots.push({
+    let {spotName, address, latLng, description} = this.state.addModals;
+    let newSpot = {
       spotName: spotName,
       address: address,
-      geo: [latLng.getLat(), latLng.getLng()]
-    });
+      geo: [latLng.getLat(), latLng.getLng()],
+      description: description
+    };
+
+    spots.push(newSpot);
 
     this.setState({
       spots: spots
     }, () => {
       this.renderMarkers();
       this.handleModalClose();
-      //this.fetchSpots();
-    })
+    });
+
+    return $.ajax({
+      url: '/api/spots',
+      type: 'POST',
+      data: JSON.stringify(newSpot),
+      contentType: 'application/json',
+      dataType: 'json'
+    }).done(() => {
+      console.log(result);
+    });
   }
 
   fetchSpots() {
     this.setState({
       nowLoading: true
     }, () => {
-      $.get('/api/spots')
+      const bounds = this.map.getBounds();
+      const swLatLng = bounds.getSouthWest();
+      const neLatLng = bounds.getNorthEast();
+
+      const querystring = `x1=${neLatLng.getLat()}&y1=${neLatLng.getLng()}&x2=${swLatLng.getLat()}&y2=${swLatLng.getLng()}`;
+      $.get(`/api/spots?${querystring}`)
         .done((result) => {
           this.setState({
             spots: result.spots
@@ -94,22 +112,24 @@ export default class Spots extends React.Component {
     const {spots} = this.state;
 
     spots.forEach(spot => {
-      let marker = new daum.maps.Marker({
-        position: new daum.maps.LatLng(spot.geo[0], spot.geo[1]),
-        clickable: true
-      });
+      if (_.isArray(spot.geo) && spot.geo.length === 2) {
+        let marker = new daum.maps.Marker({
+          position: new daum.maps.LatLng(spot.geo[0], spot.geo[1]),
+          clickable: true
+        });
 
-      marker.infoWindow = new daum.maps.InfoWindow({
-        content: `<div style="padding:5px"><h5>${spot.spotName}</h5><p>${spot.description}</p></div>`,
-        removable: true
-      });
-      marker.setMap(this.map);
-      this.markers.push(marker);
+        marker.infoWindow = new daum.maps.InfoWindow({
+          content: `<div style="padding:5px"><h5>${spot.spotName}</h5><p>${spot.description}</p></div>`,
+          removable: true
+        });
+        marker.setMap(this.map);
+        this.markers.push(marker);
 
-      // marker 이벤트 등록
-      daum.maps.event.addListener(marker, 'click', () => {
-        marker.infoWindow.open(this.map, marker);
-      });
+        // marker 이벤트 등록
+        daum.maps.event.addListener(marker, 'click', () => {
+          marker.infoWindow.open(this.map, marker);
+        });
+      }
     });
   }
 
@@ -128,7 +148,7 @@ export default class Spots extends React.Component {
 
     let panelHeader = <h3>Spot List</h3>;
 
-    let {spotName, address} = this.state.addModals;
+    let {spotName, address, description} = this.state.addModals;
 
     return (
       <App>
@@ -146,17 +166,18 @@ export default class Spots extends React.Component {
                   <FormControl type="text"
                                placeholder="스팟의 이름을 입력해주세요."
                                value={spotName}
-                               onChange={this.handleAddModalsSpotNameChange}/>
+                               onChange={this.handleFormChange.bind(this, 'spotName')}/>
                 </Col>
               </FormGroup>
-
               <FormGroup controlId="description">
                 <Col componentClass={ControlLabel} xs={6} sm={2}>
                   스팟 설명
                 </Col>
                 <Col xs={6} sm={10}>
                   <FormControl componentClass="textarea"
-                               placeholder="스팟에 대한 설명을 적어주세요."/>
+                               value={description}
+                               placeholder="스팟에 대한 설명을 적어주세요."
+                               onChange={this.handleFormChange.bind(this, 'description')}/>
                 </Col>
               </FormGroup>
               <FormGroup controlId="address">
@@ -200,8 +221,7 @@ export default class Spots extends React.Component {
     const {x, y} = e.pointers[0];
     const point = new daum.maps.Point(x, y - $('.navbar').height());
 
-    const latLng = proj.coordsFromPoint(point);
-
+    const latLng = proj.coordsFromContainerPoint(point);
     const geocoder = new daum.maps.services.Geocoder();
 
     return geocoder.coord2detailaddr(latLng, (status, result) => {
@@ -228,9 +248,9 @@ export default class Spots extends React.Component {
 
   };
 
-  handleAddModalsSpotNameChange = (e) => {
+  handleFormChange = (field, e) => {
     let {addModals} = this.state;
-    addModals.spotName = e.target.value;
+    addModals[field] = e.target.value;
     this.setState({
       addModals: addModals
     });
