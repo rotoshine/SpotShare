@@ -1,15 +1,16 @@
-# 스팟 공유
+# what is this?
+지도 기반으로 각종 스팟을 공유할 수 있는 프로그램.
 
-## 설치법
+# installation
 
-* prject를 clone 받는다.
-* npm install 로 모듈을 설치한다.
-* server/config.sample.js를 참고하여 server/config.js를 만든다.
+1. clone this project.
+2. run `npm install` from terminal. 
+3. create a `server/config.js` using the `server/config.sample.js`
 ```javascript
 module.exports = {
   mongo: 'mongodb://localhost/spots',
   daumMapApiKey: '',
-  title: '보드 스팟 공유',
+  title: 'Board Spot Share',
   auth: {
     facebook: {
       appId: '',
@@ -20,7 +21,7 @@ module.exports = {
 };
 ```
 
-* 아래의 커맨드로 실행 가능.
+4. run server.
 ```
 npm run start-dev # 개발모드로 실행
 npm run start
