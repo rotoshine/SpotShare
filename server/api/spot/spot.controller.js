@@ -18,7 +18,9 @@ exports.findAll = (req, res) => {
         ]
       }
     }
-  }).exec((err, spots) => {
+  })
+  .populate('createdBy', 'name')
+  .exec((err, spots) => {
     if (err) {
       return res.status(500).json({
         error: err.message
@@ -36,21 +38,20 @@ exports.findById = (req, res) => {
 };
 
 exports.save = (req, res) => {
-  let body = req.body;
+    let body = req.body;
 
-  let spot = new Spot(body);
-  spot.createdBy = req.user._id;
+    let spot = new Spot(body);
+    spot.createdBy = req.user._id;
 
-  return spot.save((err) => {
-    if (err) {
-      return res.status(500).json({
-        error: e.message
-      });
-    } else {
-      return res.send();
-    }
-  })
-
+    return spot.save((err) => {
+      if (err) {
+        return res.status(500).json({
+          error: e.message
+        });
+      } else {
+        return res.send();
+      }
+    });
 };
 
 exports.update = (req, res) => {

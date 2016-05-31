@@ -16,7 +16,8 @@ export default class Spots extends React.Component {
       latLng: null
     },
     spots: [],
-    height: 0
+    height: 0,
+    user: JSON.parse(document.getElementById('user').innerHTML)
   };
 
   componentDidMount() {
@@ -210,7 +211,9 @@ export default class Spots extends React.Component {
           <div className="map-wrapper">
             <div className="map" id="spot-map" style={style}></div>
             <div className="map-control col-md-4 hidden-xs">
-              <Well>스팟을 등록하려면 해당 위치를 길게 누르세요.</Well>
+              <Well>{this.state.user.isLogined ?
+                '스팟을 등록하려면 해당 위치를 길게 누르세요' :
+                '스팟을 등록하려면 로그인 하세요.'}.</Well>
               <Panel>
                 <ul className="list-unstyled">
                   {spotListComponents}
@@ -225,37 +228,38 @@ export default class Spots extends React.Component {
   }
 
   handlePress = (e) => {
-    // getting pressed position
-    const proj = this.map.getProjection();
-    const {x, y} = e.pointers[0];
-    const point = new daum.maps.Point(x, y - $('.navbar').height());
+    if(this.state.user.isLogined){
+      // getting pressed position
+      const proj = this.map.getProjection();
+      const {x, y} = e.pointers[0];
+      const point = new daum.maps.Point(x, y - $('.navbar').height());
 
-    const latLng = proj.coordsFromContainerPoint(point);
-    const geocoder = new daum.maps.services.Geocoder();
+      const latLng = proj.coordsFromContainerPoint(point);
+      const geocoder = new daum.maps.services.Geocoder();
 
-    // getting pressed positions address
-    return geocoder.coord2detailaddr(latLng, (status, result) => {
-      if (status === daum.maps.services.Status.OK) {
-        let address = result[0].roadAddress.name;
-        if (_.isEmpty(address)) {
-          address = `[지번] ${result[0].jibunAddress.name}`;
-        }
-
-        if (_.isEmpty(address)) {
-          address = result[0].region
-        }
-        this.setState({
-          addModals: {
-            visibleModal: true,
-            latLng: latLng,
-            address: address
+      // getting pressed positions address
+      return geocoder.coord2detailaddr(latLng, (status, result) => {
+        if (status === daum.maps.services.Status.OK) {
+          let address = result[0].roadAddress.name;
+          if (_.isEmpty(address)) {
+            address = `[지번] ${result[0].jibunAddress.name}`;
           }
-        }, () => {
-          $('#spotName').focus();
-        });
-      }
-    });
 
+          if (_.isEmpty(address)) {
+            address = result[0].region
+          }
+          this.setState({
+            addModals: {
+              visibleModal: true,
+              latLng: latLng,
+              address: address
+            }
+          }, () => {
+            $('#spotName').focus();
+          });
+        }
+      });
+    }
   };
 
   handleFormChange = (field, e) => {
