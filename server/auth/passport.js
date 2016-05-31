@@ -3,7 +3,8 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
-module.exports = (passport, config) => {
+module.exports = (app, passport, config) => {
+
   passport.use(new FacebookStrategy({
     clientID: config.auth.facebook.appId,
     clientSecret: config.auth.facebook.appSecret,
@@ -40,5 +41,31 @@ module.exports = (passport, config) => {
         }
       }
     })
-  }));  
+  }));
+
+  passport.serializeUser((user, done) => {
+    return done(null, user.id);
+  });
+
+  passport.deserializeUser((id, done) => {
+    return User.findById(id, (err, user) => {
+      return done(err, user);
+    });
+  });
+  app.get('/auth/facebook/login', passport.authenticate('facebook', {
+    session: true,
+    scope: ['public_profile', 'user_about_me', 'user_location']
+  }));
+  app.get('/auth/facebook/login/callback', passport.authenticate('facebook', {
+    session: true,
+    successRedirect: '/'
+  }));
+  app.get('/api/me', passport.authenticate('facebook', { session: true }), (req, res) => {
+    res.json(req.user);
+  });
+  app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+  });
+
 };

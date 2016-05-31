@@ -15,6 +15,11 @@ module.exports = (mongoose) => {
       type: Date,
       default: Date.now()
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
     geo: { type: [Number], index: '2d' }
   });
   mongoose.model('Spot', SpotSchema);

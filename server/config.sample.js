@@ -2,6 +2,7 @@ module.exports = {
   mongo: 'mongodb://localhost/spots',
   daumMapApiKey: '',
   title: '보드 스팟 공유',
+  sessionSecret: '',
   auth: {
     facebook: {
       appId: '',

@@ -8,13 +8,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const exphbs = require('express-handlebars');
+const passport = require('passport');
 const app = express();
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const webpackMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const webpack = require('webpack');
 const webpackConfig = require('../webpack.config.js');
 const parseArgs = require('minimist');
+
 
 const argv = parseArgs(process.argv.slice(2));
 
@@ -33,8 +37,14 @@ if(argv.dev){
 }
 
 // middleware loading
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(session({
+  secret: config.sessionSecret || 'roto_is_good_programmer'
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // mongoose connect
 mongoose.connect(config.mongo);
@@ -51,21 +61,6 @@ if(_.isArray(modelPaths)){
   console.log('model loading done.');
 }
 
-// auth config
-const passport = require('passport');
-require('./auth/passport')(passport, config);
-app.get('/auth/facebook/login', passport.authenticate('facebook', {
-  session: false,
-  scope: ['public_profile', 'user_about_me', 'user_location']
-}));
-app.get('/auth/facebook/login/callback', passport.authenticate('facebook', {
-  session: false,
-  successRedirect: '/'
-}));
-app.get('/api/me', passport.authenticate('facebook', { session: false}), (req, res) => {
-  res.json(req.user);
-});
-
 // api loading
 const apiPaths = glob.sync(`${__dirname}/api/**/index.js`);
 if(_.isArray(apiPaths)){
@@ -77,6 +72,9 @@ if(_.isArray(apiPaths)){
   console.log('api loading done.');
 }
 
+// auth config
+require('./auth/passport')(app, passport, config);
+
 // client setting
 const CLIENT_PATH = path.resolve(`${__dirname}`, '../client');
 app.use(express.static(CLIENT_PATH));
@@ -87,9 +85,20 @@ app.set('views', `${__dirname}/views`);
 app.set('view engine', 'handlebars');
 
 app.get('', (req, res) => {
+  let user = {
+    isLogined: false
+  };
+  if(req.user){
+    user = {
+      isLogined: true,
+      name: req.user.name
+    }
+  }
+
   return res.render('index', {
     title: config.title,
-    daumMapApiKey: config.daumMapApiKey
+    daumMapApiKey: config.daumMapApiKey,
+    user: JSON.stringify(user)
   });
 });
 
