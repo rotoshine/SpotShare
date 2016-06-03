@@ -34,7 +34,15 @@ exports.findAll = (req, res) => {
 };
 
 exports.findById = (req, res) => {
+  const spotId = req.params.spotId;
 
+  return Spot.findById(spotId, (err, spot) => {
+    handleError(err, res, () => {
+      return res.json({
+        spot: spot
+      });
+    });
+  });
 };
 
 exports.save = (req, res) => {

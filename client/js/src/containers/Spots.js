@@ -9,12 +9,16 @@ import App from '../App';
 export default class Spots extends React.Component {
   state = {
     nowLoading: false,
-    addModals: {
-      visibleModal: false,
+    addModal: {
+      visible: false,
       spotName: null,
       address: null,
       description: null,
       latLng: null
+    },
+    detailDisplayModal: {
+      visible: false,
+      displaySpot: null
     },
     spots: Immutable.List.of(),
     height: 0,
@@ -59,7 +63,7 @@ export default class Spots extends React.Component {
 
   createSpot() {
     let {spots} = this.state;
-    let {spotName, address, latLng, description} = this.state.addModals;
+    let {spotName, address, latLng, description} = this.state.addModal;
     let newSpot = {
       spotName: spotName,
       address: address,
@@ -96,7 +100,7 @@ export default class Spots extends React.Component {
       const neLatLng = bounds.getNorthEast();
 
       const querystring = `x1=${neLatLng.getLat()}&y1=${neLatLng.getLng()}&x2=${swLatLng.getLat()}&y2=${swLatLng.getLng()}`;
-      $.get(`/api/spots?${querystring}`)
+      return $.get(`/api/spots?${querystring}`)
         .done((result) => {
           this.setState({
             spots: result.spots
@@ -119,16 +123,19 @@ export default class Spots extends React.Component {
           clickable: true
         });
 
-        marker.infoWindow = new daum.maps.InfoWindow({
-          content: `<div style="padding:5px"><h5>${spot.spotName}</h5><p>${spot.description}</p></div>`,
-          removable: true
-        });
+        marker.spotId = spot._id;
+
         marker.setMap(this.map);
         this.markers.push(marker);
 
         // marker 이벤트 등록
         daum.maps.event.addListener(marker, 'click', () => {
-          marker.infoWindow.open(this.map, marker);
+          this.setState({
+            detailDisplayModal: {
+              visible: true,
+              displaySpot: spot
+            }
+          });
         });
       }
     });
@@ -157,11 +164,40 @@ export default class Spots extends React.Component {
       }
     }
 
-    let {spotName, address, description} = this.state.addModals;
+    const {displaySpot} = this.state.detailDisplayModal;
+    let detailDisplayModal = null;
+
+    if(displaySpot !== null){
+      detailDisplayModal = (
+        <Modal show={this.state.detailDisplayModal.visible} onHide={this.handleModalClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>{displaySpot.spotName} 상세정보</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <dl className="dl-horizontal">
+              <dt>이름</dt>
+              <dd>{displaySpot.spotName}</dd>
+              <dt>주소</dt>
+              <dd>{displaySpot.address}</dd>
+              <dt>설명</dt>
+              <dd>{displaySpot.description}</dd>
+            </dl>
+            <Well>
+              <span className="label label-primary">{displaySpot.createdBy.name}</span>
+              님이 공유
+            </Well>
+          </Modal.Body>
+        </Modal>
+      );
+    }
+
+
+    const {spotName, address, description} = this.state.addModal;
 
     return (
       <App>
-        <Modal show={this.state.addModals.visibleModal} onHide={this.handleModalClose}>
+        {detailDisplayModal}
+        <Modal show={this.state.addModal.visible} onHide={this.handleModalClose}>
           <Modal.Header closeButton>
             <Modal.Title>스팟 등록하기</Modal.Title>
           </Modal.Header>
@@ -250,8 +286,8 @@ export default class Spots extends React.Component {
             address = result[0].region
           }
           this.setState({
-            addModals: {
-              visibleModal: true,
+            addModal: {
+              visible: true,
               latLng: latLng,
               address: address
             }
@@ -264,19 +300,23 @@ export default class Spots extends React.Component {
   };
 
   handleFormChange = (field, e) => {
-    let {addModals} = this.state;
-    addModals[field] = e.target.value;
+    let {addModal} = this.state;
+    addModal[field] = e.target.value;
     this.setState({
-      addModals: addModals
+      addModal: addModal
     });
   };
 
   handleModalClose = () => {
     this.setState({
-      addModals: {
-        visibleModal: false,
+      addModal: {
+        visible: false,
         eventX: null,
         eventY: null
+      },
+      detailDisplayModal: {
+        visible: false,
+        displaySpot: null
       }
     });
   };
