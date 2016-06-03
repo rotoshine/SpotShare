@@ -2,6 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import Hammer from 'react-hammerjs';
+import Immutable from 'immutable';
 import {Button, Well, Panel, Form, FormGroup, FormControl, Input, Col, ControlLabel, Modal} from 'react-bootstrap';
 
 import App from '../App';
@@ -15,7 +16,7 @@ export default class Spots extends React.Component {
       description: null,
       latLng: null
     },
-    spots: [],
+    spots: Immutable.List.of(),
     height: 0,
     user: JSON.parse(document.getElementById('user').innerHTML)
   };
@@ -38,7 +39,7 @@ export default class Spots extends React.Component {
     };
 
     this.map = new daum.maps.Map(container, options);
-    this.markers = [];
+    this.markers = Immutable.List.of();
 
     this.fetchSpots();
   }
@@ -107,7 +108,7 @@ export default class Spots extends React.Component {
   }
 
   renderMarkers() {
-    this.markers = [];
+    this.markers = Immutable.List.of();
 
     const {spots} = this.state;
 

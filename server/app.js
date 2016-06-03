@@ -11,6 +11,7 @@ const exphbs = require('express-handlebars');
 const passport = require('passport');
 const app = express();
 const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const webpackMiddleware = require('webpack-dev-middleware');
@@ -40,14 +41,19 @@ if(argv.dev){
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// mongoose connect
+mongoose.connect(config.mongo);
+
+// session
 app.use(session({
-  secret: config.sessionSecret || 'roto_is_good_programmer'
+  secret: config.sessionSecret || 'roto_is_good_programmer',
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// mongoose connect
-mongoose.connect(config.mongo);
+
 
 // model loading
 const modelPaths = glob.sync(`${__dirname}/**/*.model.js`);

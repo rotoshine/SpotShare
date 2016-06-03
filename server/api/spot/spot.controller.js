@@ -1,9 +1,9 @@
 'use strict';
+const _ = require('lodash');
 const mongoose = require('mongoose');
 const Spot = mongoose.model('Spot');
 
 exports.findAll = (req, res) => {
-  console.log(req.user);
   let queryParams = req.query;
   let x1 = queryParams.x1;
   let x2 = queryParams.x2;
@@ -61,3 +61,54 @@ exports.update = (req, res) => {
 exports.remove = (req, res) => {
 
 };
+
+exports.like = (req, res) => {
+  let spotId = req.params.spotId;
+  return Spot.findById(spotId, (err, spot) => {
+    handleError(err, res, () => {
+      const userId = req.user._id;
+      if(!_.includes(spot.likes, userId)){
+        spot.likes.push(userId);
+        return spot.save(err => {
+          handleError(err, res, () => {
+            return res.status(200).json({
+              result: 'success'
+            });
+          });
+        })
+      }
+    });
+  });
+};
+
+exports.unlike = (req, res) => {
+  let spotId = req.params.spotId;
+  return Spot.findById(spotId, (err, spot) => {
+    handleError(err, res, () => {
+      const userId = req.user._id;
+      if(_.includes(spot.likes, userId)){
+        spot.likes = _.remove(spot.likes, (likeId) => {
+          return likeId === userId
+        });
+
+        return spot.save(err => {
+          handleError(err, res, () => {
+            return res.status(200).json({
+              result: 'success'
+            });
+          });
+        })
+      }
+    });
+  });
+};
+
+function handleError(err, res, cb){
+  if(err){
+    return res.status(500).json({
+      error: err.message
+    });
+  }else{
+    return cb();
+  }
+}

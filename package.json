@@ -1,7 +1,7 @@
 {
-  "name": "board-spot",
+  "name": "SpotShare",
   "version": "0.0.1",
-  "description": "보드 스팟 공유 웹 애플리케이션",
+  "description": "지도 기반 장소 공유 웹 애플리케이션",
   "scripts": {
     "dev-start": "node server/app.js --dev",
     "start": "webpack && node server/app.js",
@@ -41,12 +41,14 @@
     "body-parser": "^1.15.1",
     "bootstrap": "^3.3.6",
     "bootstrap-material-design": "^0.5.9",
+    "connect-mongo": "^1.2.0",
     "cookie-parser": "^1.4.3",
     "dotenv": "^2.0.0",
     "express": "^4.13.4",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.13.0",
     "glob": "^7.0.3",
+    "immutable": "^3.8.1",
     "jquery": "^2.2.3",
     "minimist": "^1.2.0",
     "mongoose": "^4.4.15",
@@ -56,6 +58,7 @@
     "react-bootstrap": "^0.29.3",
     "react-dom": "^15.0.0",
     "react-hammerjs": "^0.4.6",
-    "react-router": "^2.4.0"
+    "react-router": "^2.4.0",
+    "react-router-redux": "^4.0.4"
   }
 }

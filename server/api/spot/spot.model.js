@@ -20,7 +20,12 @@ module.exports = (mongoose) => {
       ref: 'User',
       required: true
     },
-    geo: { type: [Number], index: '2d' }
+    geo: { type: [Number], index: '2d' },
+    likes: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }]
   });
   mongoose.model('Spot', SpotSchema);
 };
