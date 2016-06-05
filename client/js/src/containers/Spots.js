@@ -3,9 +3,11 @@ import $ from 'jquery';
 import _ from 'lodash';
 import Hammer from 'react-hammerjs';
 import Immutable from 'immutable';
-import {Button, Well, Panel, Form, FormGroup, FormControl, Input, Col, ControlLabel, Modal} from 'react-bootstrap';
+import {Button, Well, Panel, Form, FormGroup, FormControl, Input, ControlLabel, Modal, Row, Col} from 'react-bootstrap';
 
 import App from '../App';
+import CommentBox from '../components/CommentBox';
+
 export default class Spots extends React.Component {
   state = {
     nowLoading: false,
@@ -141,6 +143,46 @@ export default class Spots extends React.Component {
     });
   }
 
+  createDetailDisplayModal() {
+    const {displaySpot} = this.state.detailDisplayModal;
+
+    if (displaySpot === null) {
+      return null;
+    }
+
+    let description = displaySpot.description;
+
+    if(description === null || description === ''){
+      description = '설명이 딱히 없네요.';
+    }
+
+    return (
+      <Modal show={this.state.detailDisplayModal.visible} onHide={this.handleModalClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>{displaySpot.spotName} 상세정보</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <dl className="dl-horizontal">
+            <dt>이름</dt>
+            <dd>{displaySpot.spotName}</dd>
+            <dt>주소</dt>
+            <dd>{displaySpot.address}</dd>
+            <dt>설명</dt>
+            <dd>{description}</dd>
+          </dl>
+          <hr/>
+          <div className="row" style={{marginTop:-10, marginBottom:10}}>
+            <div className="col-xs-offset-2">
+              <span className="label label-primary">{displaySpot.createdBy.name}</span>
+              <span>님이 공유한 장소입니다.</span>
+            </div>
+          </div>
+          <CommentBox spotId={displaySpot._id} />
+        </Modal.Body>
+      </Modal>
+    );
+  }
+
   render() {
     let style = {width: '100%', height: this.state.height};
 
@@ -148,7 +190,7 @@ export default class Spots extends React.Component {
 
     const {spots} = this.state;
 
-    if(_.isArray(spots)){
+    if (_.isArray(spots)) {
       spots.forEach((spot, i) => {
         spotListComponents.push(
           <li key={i}>
@@ -157,9 +199,9 @@ export default class Spots extends React.Component {
         );
       });
 
-      if(spotListComponents.length === 0){
+      if (spotListComponents.length === 0) {
         spotListComponents.push(
-          <li key="empty">이 지역엔 공유된 스팟이 없습니다.</li>
+          <li key="empty">이 지역엔 공유된 장소가 없습니다.</li>
         )
       }
     }
@@ -167,36 +209,11 @@ export default class Spots extends React.Component {
     const {displaySpot} = this.state.detailDisplayModal;
     let detailDisplayModal = null;
 
-    if(displaySpot !== null){
-      detailDisplayModal = (
-        <Modal show={this.state.detailDisplayModal.visible} onHide={this.handleModalClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>{displaySpot.spotName} 상세정보</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <dl className="dl-horizontal">
-              <dt>이름</dt>
-              <dd>{displaySpot.spotName}</dd>
-              <dt>주소</dt>
-              <dd>{displaySpot.address}</dd>
-              <dt>설명</dt>
-              <dd>{displaySpot.description}</dd>
-            </dl>
-            <Well>
-              <span className="label label-primary">{displaySpot.createdBy.name}</span>
-              님이 공유
-            </Well>
-          </Modal.Body>
-        </Modal>
-      );
-    }
-
-
     const {spotName, address, description} = this.state.addModal;
 
     return (
       <App>
-        {detailDisplayModal}
+        {this.createDetailDisplayModal()}
         <Modal show={this.state.addModal.visible} onHide={this.handleModalClose}>
           <Modal.Header closeButton>
             <Modal.Title>스팟 등록하기</Modal.Title>
@@ -255,7 +272,8 @@ export default class Spots extends React.Component {
                 <ul className="list-unstyled">
                   {spotListComponents}
                 </ul>
-                <Button size="xs" onClick={this.handleCurrentPositionClick}>현재 위치 찾기</Button>
+                <Button size="xs" onClick={this.handleCurrentPositionClick}>
+                  <i className="fa fa-location-arrow"/> 현재 위치 찾기</Button>
               </Panel>
             </div>
           </div>
@@ -265,7 +283,7 @@ export default class Spots extends React.Component {
   }
 
   handlePress = (e) => {
-    if(this.state.user.isLogined){
+    if (this.state.user.isLogined) {
       // getting pressed position
       const proj = this.map.getProjection();
       const {x, y} = e.pointers[0];
@@ -335,12 +353,12 @@ export default class Spots extends React.Component {
   handleCurrentPositionClick = (e) => {
     e.preventDefault();
     // geolocation 사용이 가능한 경우
-    if('geolocation' in navigator){
+    if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((position) => {
         const {latitude, longitude} = position.coords;
         this.map.setCenter(new daum.maps.LatLng(latitude, longitude));
       });
-    }else{
+    } else {
       alert('현재 브라우저에선 지원하지 않는 기능입니다.');
     }
   }

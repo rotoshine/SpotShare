@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const mongoose = require('mongoose');
 const Spot = mongoose.model('Spot');
-
+const handleError = require('../../utils/handleError').handleError;
 exports.findAll = (req, res) => {
   let queryParams = req.query;
   let x1 = queryParams.x1;
@@ -111,12 +111,3 @@ exports.unlike = (req, res) => {
   });
 };
 
-function handleError(err, res, cb){
-  if(err){
-    return res.status(500).json({
-      error: err.message
-    });
-  }else{
-    return cb();
-  }
-}

@@ -18,7 +18,9 @@ export default class App extends React.Component {
 
     let userComponent = null;
     let authButton = (
-      <NavItem eventKey={1} href="/auth/facebook/login">Login</NavItem>
+      <NavItem eventKey={1} href="/auth/facebook/login">
+        <i className="fa fa-facebook"/> Login
+      </NavItem>
     );
     if (user.isLogined) {
       userComponent = (
