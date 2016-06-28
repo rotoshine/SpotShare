@@ -29,7 +29,7 @@ export default class Spots extends React.Component {
 
   componentDidMount() {
     this.setState({
-      height: $(window).height() - $('.navbar').height() - 2
+      height: $(window).height() - $('.navbar').height()
     }, () => {
       this.createMap();
       this.registEvents();
@@ -102,6 +102,7 @@ export default class Spots extends React.Component {
       const neLatLng = bounds.getNorthEast();
 
       const querystring = `x1=${neLatLng.getLat()}&y1=${neLatLng.getLng()}&x2=${swLatLng.getLat()}&y2=${swLatLng.getLng()}`;
+      console.log(querystring);
       return $.get(`/api/spots?${querystring}`)
         .done((result) => {
           this.setState({

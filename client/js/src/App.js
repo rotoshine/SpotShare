@@ -13,12 +13,15 @@ export default class App extends React.Component {
     user: JSON.parse(document.getElementById('user').innerHTML)
   };
 
+  componentDidMount() {
+    window.$.material.init();
+  }
   render() {
     const {user} = this.state;
 
     let userComponent = null;
     let authButton = (
-      <NavItem eventKey={1} href="/auth/facebook/login">
+      <NavItem eventKey={1} href="/auth/facebook/login" className="btn-raised">
         <i className="fa fa-facebook"/> Login
       </NavItem>
     );
@@ -29,7 +32,11 @@ export default class App extends React.Component {
         </NavItem>
       );
       authButton = (
-        <NavItem eventKey={1} href="/logout">Logout</NavItem>
+        <li eventKey={1}>
+          <div className="bs-components" style={{marginTop:10}}>
+            <a href="/logout" className="btn btn-raised btn-xs btn-danger">Logout</a>
+          </div>
+        </li>
       );
     }
 
