@@ -1,53 +1,82 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import $ from 'jquery';
 import _ from 'lodash';
 import Hammer from 'react-hammerjs';
 import Immutable from 'immutable';
+
+import * as SpotActionCreators from '../actions/SpotsActionCreators';
+import * as CommentActionCreators from '../actions/CommentActionCreators';
+
 import {Button, Well, Panel, Form, FormGroup, FormControl, Input, ControlLabel, Modal, Row, Col} from 'react-bootstrap';
 
-import App from '../App';
-import CommentBox from '../components/CommentBox';
 
-export default class Spots extends React.Component {
+import App from '../App';
+import SpotList from '../components/SpotList';
+import SpotFormModal from '../components/SpotFormModal';
+import SpotDetailModal from '../components/SpotDetailModal';
+import CommentBox from '../components/comments/CommentBox';
+
+
+class Spots extends React.Component {
+  static propTypes = {
+    nowLoading: PropTypes.bool.isRequired,
+    spots: PropTypes.array.isRequired,
+    spotForm: PropTypes.shape({
+      spotName: PropTypes.string,
+      description: PropTypes.string,
+      address: PropTypes.string,
+      geo: []
+    }).isRequired,
+    comments: PropTypes.array
+  };
+
   state = {
     nowLoading: false,
     addModal: {
-      visible: false,
-      spotName: null,
-      address: null,
-      description: null,
-      latLng: null
+      visible: false
     },
     detailDisplayModal: {
       visible: false,
       displaySpot: null
     },
-    spots: Immutable.List.of(),
     height: 0,
     user: JSON.parse(document.getElementById('user').innerHTML)
   };
+
+  constructor(props) {
+    super(props);
+
+    const {dispatch} = props;
+
+    this.actions = bindActionCreators(SpotActionCreators, dispatch);
+    this.commentActions = bindActionCreators(CommentActionCreators, dispatch);
+  }
 
   componentDidMount() {
     this.setState({
       height: $(window).height() - $('.navbar').height()
     }, () => {
       this.createMap();
-      this.registEvents();
     });
   }
 
   createMap() {
-    // daum map initialize
-    let container = document.getElementById('spot-map');
-    let options = {
-      center: new daum.maps.LatLng(37.54251441506003, 127.11770256831429), //지도의 중심좌표.
-      level: 3 //지도의 레벨(확대, 축소 정도)
-    };
+    this.getCurrentPosition().then((latLng) => {
+      // daum map initialize
+      let container = document.getElementById('spot-map');
+      let options = {
+        center: new daum.maps.LatLng(latLng.latitude, latLng.longitude), //지도의 중심좌표.
+        level: 3 //지도의 레벨(확대, 축소 정도)
+      };
 
-    this.map = new daum.maps.Map(container, options);
-    this.markers = Immutable.List.of();
+      this.map = new daum.maps.Map(container, options);
+      this.markers = Immutable.List.of();
 
-    this.fetchSpots();
+      this.fetchSpots();
+      this.registEvents();
+    });
   }
 
   registEvents() {
@@ -64,60 +93,35 @@ export default class Spots extends React.Component {
   }
 
   createSpot() {
-    let {spots} = this.state;
-    let {spotName, address, latLng, description} = this.state.addModal;
-    let newSpot = {
-      spotName: spotName,
-      address: address,
-      geo: [latLng.getLat(), latLng.getLng()],
-      description: description
-    };
-
-    spots.push(newSpot);
-
-    this.setState({
-      spots: spots
-    }, () => {
-      this.renderMarkers();
-      this.handleModalClose();
+    this.actions.createSpot(this.props.spotForm).then(() => {
+      this.fetchSpots();
     });
+    this.actions.resetSpotForm();
 
-    return $.ajax({
-      url: '/api/spots',
-      type: 'POST',
-      data: JSON.stringify(newSpot),
-      contentType: 'application/json',
-      dataType: 'json'
-    }).done(() => {
-      console.log(result);
-    });
+    this.renderMarkers();
+    this.handleModalClose();
+
   }
 
   fetchSpots() {
-    this.setState({
-      nowLoading: true
-    }, () => {
-      const bounds = this.map.getBounds();
-      const swLatLng = bounds.getSouthWest();
-      const neLatLng = bounds.getNorthEast();
+    const bounds = this.map.getBounds();
+    const swLatLng = bounds.getSouthWest();
+    const neLatLng = bounds.getNorthEast();
 
-      const querystring = `x1=${neLatLng.getLat()}&y1=${neLatLng.getLng()}&x2=${swLatLng.getLat()}&y2=${swLatLng.getLng()}`;
-
-      return $.get(`/api/spots?${querystring}`)
-        .done((result) => {
-          this.setState({
-            spots: result.spots
-          }, () => {
-            this.renderMarkers();
-          });
-        })
+    this.actions.fetchSpots(
+      neLatLng.getLat(),
+      neLatLng.getLng(),
+      swLatLng.getLat(),
+      swLatLng.getLng()
+    ).then(() => {
+      this.renderMarkers();
     });
   }
 
   renderMarkers() {
     this.markers = Immutable.List.of();
 
-    const {spots} = this.state;
+    const {spots} = this.props;
 
     spots.forEach(spot => {
       if (_.isArray(spot.geo) && spot.geo.length === 2) {
@@ -133,149 +137,112 @@ export default class Spots extends React.Component {
 
         // marker 이벤트 등록
         daum.maps.event.addListener(marker, 'click', () => {
-          this.setState({
-            detailDisplayModal: {
-              visible: true,
-              displaySpot: spot
-            }
-          });
+          this.showSpotDetail(spot);
         });
       }
     });
   }
 
-  createDetailDisplayModal() {
-    const {displaySpot} = this.state.detailDisplayModal;
+  showSpotDetail(spot) {
+    this.commentActions.fetchComments(spot._id);
+    this.setState({
+      detailDisplayModal: {
+        visible: true,
+        displaySpot: spot
+      }
+    });
+  }
 
-    if (displaySpot === null) {
-      return null;
-    }
+  showSpotFormModal(x, y) {
+    // getting pressed position
+    const proj = this.map.getProjection();
+    const point = new daum.maps.Point(x, y - $('.navbar').height());
 
-    let description = displaySpot.description;
+    const latLng = proj.coordsFromContainerPoint(point);
+    console.log(latLng);
+    const geocoder = new daum.maps.services.Geocoder();
 
-    if(description === null || description === ''){
-      description = '설명이 딱히 없네요.';
-    }
+    // getting pressed positions address
+    return geocoder.coord2detailaddr(latLng, (status, result) => {
+      if (status === daum.maps.services.Status.OK) {
+        let address = result[0].roadAddress.name;
+        if (_.isEmpty(address)) {
+          address = `[지번] ${result[0].jibunAddress.name}`;
+        }
 
-    return (
-      <Modal show={this.state.detailDisplayModal.visible} onHide={this.handleModalClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>{displaySpot.spotName} 상세정보</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <dl className="dl-horizontal">
-            <dt>이름</dt>
-            <dd>{displaySpot.spotName}</dd>
-            <dt>주소</dt>
-            <dd>{displaySpot.address}</dd>
-            <dt>설명</dt>
-            <dd>{description}</dd>
-          </dl>
-          <hr/>
-          <div className="row" style={{marginTop:-10, marginBottom:10}}>
-            <div className="col-xs-offset-2">
-              <span className="label label-primary">{displaySpot.createdBy.name}</span>
-              <span>님이 공유한 장소입니다.</span>
-            </div>
-          </div>
-          <CommentBox spotId={displaySpot._id} />
-        </Modal.Body>
-      </Modal>
-    );
+        if (_.isEmpty(address)) {
+          address = result[0].region
+        }
+        this.actions.updateSpotForm('geo', [latLng.getLat(), latLng.getLng()]);
+        this.actions.updateSpotForm('address', address);
+        this.setState({
+          addModal: {
+            visible: true
+          }
+        }, () => {
+          $('#spotName').focus();
+        });
+      }
+    });
+  }
+
+  getCurrentPosition() {
+    const DEFAULT_LATITUDE = 37.54251441506003;
+    const DEFAULT_LONGITUDE = 127.11770256831429;
+
+    return new Promise((resolve) => {
+      // geolocation 사용이 가능한 경우
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const {latitude, longitude} = position.coords;
+          return resolve({
+            latitude: latitude,
+            longitude: longitude
+          });
+        });
+      } else {
+        return resolve({
+          latitude: DEFAULT_LATITUDE,
+          longitude: DEFAULT_LONGITUDE
+        });
+      }
+    });
+
+  }
+
+  setCurrentPosition() {
+    this.getCurrentPosition().then((latLng) => {
+      this.map.setCenter(new daum.maps.LatLng(latLng.latitude, latLng.longitude));
+    });
+
   }
 
   render() {
     let style = {width: '100%', height: this.state.height};
 
-    let spotListComponents = [];
-
-    const {spots} = this.state;
-
-    if (_.isArray(spots)) {
-      spots.forEach((spot, i) => {
-        spotListComponents.push(
-          <li key={i}>
-            <a href="#" onClick={this.handleSpotListClick.bind(this, spot)}>{spot.spotName}</a>
-          </li>
-        );
-      });
-
-      if (spotListComponents.length === 0) {
-        spotListComponents.push(
-          <li key="empty">이 지역엔 공유된 장소가 없습니다.</li>
-        )
-      }
-    }
-
-    const {displaySpot} = this.state.detailDisplayModal;
-    let detailDisplayModal = null;
-
-    const {spotName, address, description} = this.state.addModal;
+    const {addModal, detailDisplayModal, user} = this.state;
+    const {spots, spotForm} = this.props;
 
     return (
       <App>
-        {this.createDetailDisplayModal()}
-        <Modal show={this.state.addModal.visible} onHide={this.handleModalClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>스팟 등록하기</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form horizontal onSubmit={this.handleSpotFormSubmit}>
-              <FormGroup controlId="spotName">
-                <Col componentClass={ControlLabel} xs={6} sm={2}>
-                  스팟 이름
-                </Col>
-                <Col xs={6} sm={10}>
-                  <FormControl type="text"
-                               placeholder="스팟의 이름을 입력해주세요."
-                               value={spotName}
-                               onChange={this.handleFormChange.bind(this, 'spotName')}/>
-                </Col>
-              </FormGroup>
-              <FormGroup controlId="description">
-                <Col componentClass={ControlLabel} xs={6} sm={2}>
-                  스팟 설명
-                </Col>
-                <Col xs={6} sm={10}>
-                  <FormControl componentClass="textarea"
-                               value={description}
-                               placeholder="스팟에 대한 설명을 적어주세요."
-                               onChange={this.handleFormChange.bind(this, 'description')}/>
-                </Col>
-              </FormGroup>
-              <div className="form-group">
-                <label htmlFor="address" className="col-sm-2 col-xs-6 control-label">
-                  주소
-                </label>
-                <Col sm={10}>
-                  <input id="address" type="text" value={address} className="form-control" readOnly/>
-                </Col>
-              </div>
-
-              <FormGroup>
-                <Col smOffset={2} sm={10}>
-                  <Button bsStyle="primary" type="submit">
-                    등록하기
-                  </Button>
-                </Col>
-              </FormGroup>
-            </Form>
-          </Modal.Body>
-        </Modal>
+        <SpotDetailModal visible={detailDisplayModal.visible}
+                         spot={detailDisplayModal.displaySpot}
+                         onClose={this.handleModalClose} />
+        <SpotFormModal visible={addModal.visible}
+                       spotForm={spotForm}
+                       onFormUpdate={this.actions.updateSpotForm}
+                       onClose={this.handleModalClose}
+                       onSubmit={this.handleSpotFormSubmit}/>
         <Hammer onPress={this.handlePress}>
           <div className="map-wrapper">
             <div className="map" id="spot-map" style={style}></div>
             <div className="map-control col-md-4 hidden-xs">
-              <Well>{this.state.user.isLogined ?
+              <Well>{user.isLogined ?
                 '스팟을 등록하려면 해당 위치를 길게 누르세요' :
                 '스팟을 등록하려면 로그인 하세요.'}.</Well>
-              <Panel>
-                <ul className="list-unstyled">
-                  {spotListComponents}
-                </ul>
-                <Button size="xs" onClick={this.handleCurrentPositionClick}>
-                  <i className="fa fa-location-arrow"/> 현재 위치 찾기</Button>
-              </Panel>
+              <SpotList spots={spots}
+                        onSpotClick={this.handleSpotListClick}
+                        onCurrentPositionClick={this.handleCurrentPositionClick}/>
             </div>
           </div>
         </Hammer>
@@ -285,45 +252,9 @@ export default class Spots extends React.Component {
 
   handlePress = (e) => {
     if (this.state.user.isLogined) {
-      // getting pressed position
-      const proj = this.map.getProjection();
       const {x, y} = e.pointers[0];
-      const point = new daum.maps.Point(x, y - $('.navbar').height());
-
-      const latLng = proj.coordsFromContainerPoint(point);
-      const geocoder = new daum.maps.services.Geocoder();
-
-      // getting pressed positions address
-      return geocoder.coord2detailaddr(latLng, (status, result) => {
-        if (status === daum.maps.services.Status.OK) {
-          let address = result[0].roadAddress.name;
-          if (_.isEmpty(address)) {
-            address = `[지번] ${result[0].jibunAddress.name}`;
-          }
-
-          if (_.isEmpty(address)) {
-            address = result[0].region
-          }
-          this.setState({
-            addModal: {
-              visible: true,
-              latLng: latLng,
-              address: address
-            }
-          }, () => {
-            $('#spotName').focus();
-          });
-        }
-      });
+      this.showSpotFormModal(x, y);
     }
-  };
-
-  handleFormChange = (field, e) => {
-    let {addModal} = this.state;
-    addModal[field] = e.target.value;
-    this.setState({
-      addModal: addModal
-    });
   };
 
   handleModalClose = () => {
@@ -349,19 +280,21 @@ export default class Spots extends React.Component {
   handleSpotListClick = (spot, e) => {
     e.preventDefault();
     this.map.setCenter(new daum.maps.LatLng(spot.geo[0], spot.geo[1]));
+    this.showSpotDetail(spot);
   };
 
   handleCurrentPositionClick = (e) => {
     e.preventDefault();
-    // geolocation 사용이 가능한 경우
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const {latitude, longitude} = position.coords;
-        this.map.setCenter(new daum.maps.LatLng(latitude, longitude));
-      });
-    } else {
-      alert('현재 브라우저에선 지원하지 않는 기능입니다.');
-    }
+    this.setCurrentPosition();
   }
-
 }
+
+
+export default connect((state) => {
+  return {
+    spots: state.spots.spots,
+    spotForm: state.spots.spotForm,
+    nowLoading: state.spots.nowLoading,
+    comments: state.comments
+  };
+})(Spots);

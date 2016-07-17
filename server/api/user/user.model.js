@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (mongoose) => {
+module.exports = (mongoose, plugins) => {
   const Schema = mongoose.Schema;
 
   const UserSchema = new Schema({
@@ -13,5 +13,7 @@ module.exports = (mongoose) => {
     provider: String,
     facebook: {}
   });
+
+  UserSchema.plugin(plugins.autoIncrement.plugin, 'User');
   mongoose.model('User', UserSchema);
 };

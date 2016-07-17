@@ -3,9 +3,12 @@
   "version": "0.0.1",
   "description": "지도 기반 장소 공유 웹 애플리케이션",
   "scripts": {
-    "dev-start": "node server/app.js --dev",
-    "start": "webpack && node server/app.js",
-    "lint": "eslint src"
+    "dev-start": "node server/app.js --dev NODE_ENV=development",
+    "start": "webpack && node server/app.js NODE_ENV=production",
+    "lint": "eslint src",
+    "preinstall": "npm prune",
+    "prestart": "npm install",
+    "predev-start": "npm install"
   },
   "repository": {
     "type": "git",
@@ -35,9 +38,14 @@
     "webpack": "^1.12.2",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-dev-server": "^1.12.1",
-    "webpack-hot-middleware": "^2.10.0"
+    "webpack-hot-middleware": "^2.10.0",
+    "redux-devtools": "^3.3.1",
+    "redux-devtools-chart-monitor": "^1.4.1",
+    "redux-devtools-dock-monitor": "^1.1.1",
+    "redux-devtools-log-monitor": "^1.0.11"
   },
   "dependencies": {
+    "axios": "^0.13.0",
     "body-parser": "^1.15.1",
     "bootstrap": "^3.3.6",
     "bootstrap-material-design": "^0.5.10",
@@ -52,13 +60,17 @@
     "jquery": "^2.2.3",
     "minimist": "^1.2.0",
     "mongoose": "^4.4.15",
+    "mongoose-auto-increment": "^5.0.1",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.0",
     "react": "^15.0.0",
     "react-bootstrap": "^0.29.3",
     "react-dom": "^15.0.0",
     "react-hammerjs": "^0.4.6",
+    "react-redux": "^4.4.5",
     "react-router": "^2.4.0",
-    "react-router-redux": "^4.0.4"
+    "react-router-redux": "^4.0.4",
+    "redux": "^3.5.2",
+    "redux-thunk": "^2.1.0"
   }
 }

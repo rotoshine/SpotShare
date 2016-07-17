@@ -3,6 +3,7 @@ const _ = require('lodash');
 const mongoose = require('mongoose');
 const Spot = mongoose.model('Spot');
 const handleError = require('../../utils/handleError').handleError;
+
 exports.findAll = (req, res) => {
   let queryParams = req.query;
   let x1 = queryParams.x1;
@@ -53,8 +54,9 @@ exports.save = (req, res) => {
 
     return spot.save((err) => {
       if (err) {
+        console.error(err);
         return res.status(500).json({
-          error: e.message
+          error: err.message
         });
       } else {
         return res.send();

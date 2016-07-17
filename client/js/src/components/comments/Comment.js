@@ -11,7 +11,7 @@ export default class Comment extends React.Component {
     return (
       <div>
         <div className="col-xs-2">
-          {comment.createBy.name}
+          {comment.createdBy.name}
         </div>
         <div className="col-xs-10">
           {comment.comment}

@@ -7,11 +7,9 @@ import Comment from './Comment';
 
 export default class CommentBox extends React.Component {
   static propTypes = {
-    spotId: PropTypes.string
-  };
-
-  state = {
-    comments: Immutable.List.of()
+    spotId: PropTypes.string,
+    comments: PropTypes.array,
+    onCreateComment: PropTypes.func
   };
 
   componentDidMount() {
@@ -50,7 +48,7 @@ export default class CommentBox extends React.Component {
   }
 
   render() {
-    const {comments} = this.state;
+    const {comments} = this.props;
     let commentsComponent = [];
     if (comments.length > 0) {
       comments.forEach(comment, i => {

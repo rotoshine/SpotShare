@@ -1,11 +1,11 @@
 'use strict';
 
-module.exports = (mongoose) => {
+module.exports = (mongoose, plugins) => {
   const Schema = mongoose.Schema;
 
   const CommentSchema = new Schema({
     spot: {
-      type: Schema.Types.ObjectId,
+      type: Number,
       ref: 'Spot',
       required: true
     },
@@ -18,10 +18,11 @@ module.exports = (mongoose) => {
       default: Date.now()
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: Number,
       ref: 'User',
       required: true
     }
   });
+  CommentSchema.plugin(plugins.autoIncrement.plugin, 'Comment');
   mongoose.model('Comment', CommentSchema);
 };

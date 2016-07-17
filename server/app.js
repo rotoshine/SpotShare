@@ -6,6 +6,7 @@ const glob = require('glob');
 const _ = require('lodash');
 const express = require('express');
 const mongoose = require('mongoose');
+const autoIncrement = require('mongoose-auto-increment');
 const path = require('path');
 const exphbs = require('express-handlebars');
 const passport = require('passport');
@@ -43,8 +44,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // mongoose connect
-mongoose.connect(config.mongo);
-
+const mongooseConnection = mongoose.connect(config.mongo);
 // session
 app.use(session({
   secret: config.sessionSecret || 'roto_is_good_programmer',
@@ -59,9 +59,13 @@ app.use(passport.session());
 const modelPaths = glob.sync(`${__dirname}/**/*.model.js`);
 
 if(_.isArray(modelPaths)){
+  autoIncrement.initialize(mongooseConnection);
   console.log('model loading start..');
   modelPaths.forEach((modelPath) => {
-    require(modelPath)(mongoose);
+    require(modelPath)(mongoose, {
+      autoIncrement: autoIncrement
+    });
+
     console.log(`${modelPaths} model loaded.`);
   });
   console.log('model loading done.');

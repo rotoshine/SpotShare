@@ -1,6 +1,7 @@
 'use strict';
 
-module.exports = (mongoose) => {
+module.exports = (mongoose, plugins) => {
+  const SCHEMA_NAME = 'Spot';
   const Schema = mongoose.Schema;
 
   const SpotSchema = new Schema({
@@ -16,16 +17,18 @@ module.exports = (mongoose) => {
       default: Date.now()
     },
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: Number,
       ref: 'User',
       required: true
     },
     geo: { type: [Number], index: '2d' },
     likes: [{
-      type: Schema.Types.ObjectId,
+      type: Number,
       ref: 'User',
       default: []
     }]
   });
-  mongoose.model('Spot', SpotSchema);
+
+  SpotSchema.plugin(plugins.autoIncrement.plugin, SCHEMA_NAME);
+  mongoose.model(SCHEMA_NAME, SpotSchema);
 };
