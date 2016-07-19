@@ -7,6 +7,7 @@ export default class SpotDetailModal extends React.Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
     spot: PropTypes.object,
+    comments: PropTypes.array,
     onAddComment: PropTypes.func.isRequired,
     onRemoveComment: PropTypes.func.isRequired,
     onLike: PropTypes.func.isRequired,
@@ -14,7 +15,7 @@ export default class SpotDetailModal extends React.Component {
   };
 
   render() {
-    const {spot, visible, onClose} = this.props;
+    const {spot, visible, comments, onClose, onAddComment, onRemoveComment} = this.props;
 
     if (spot === null) {
       return null;
@@ -47,7 +48,10 @@ export default class SpotDetailModal extends React.Component {
               <span>님이 공유한 장소입니다.</span>
             </div>
           </div>
-          <CommentBox spotId={spot._id}/>
+          <CommentBox spotId={spot._id}
+                      comments={comments}
+                      onAddComment={onAddComment}
+                      onRemoveComment={onRemoveComment}/>
         </Modal.Body>
       </Modal>
     );

@@ -12,6 +12,9 @@ exports.findBySpotId = (req, res) => {
       spot: spotId
     })
     .populate('createdBy', 'name')
+    .sort({
+      createdAt: -1
+    })
     .exec((err, comments) => {
       handleError(err, res, () => {
         return res.json({
@@ -24,6 +27,7 @@ exports.findBySpotId = (req, res) => {
 
 exports.create = (req, res) => {
   let comment = new Comment(req.body);
+  comment.spot = req.params.spotId;
   comment.createdBy = req.user._id;
 
   return comment.save((err) => {

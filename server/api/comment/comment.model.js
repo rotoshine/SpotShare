@@ -9,7 +9,7 @@ module.exports = (mongoose, plugins) => {
       ref: 'Spot',
       required: true
     },
-    comment: {
+    content: {
       type: String,
       required: true
     },

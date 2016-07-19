@@ -57,7 +57,7 @@
     "express-session": "^1.13.0",
     "glob": "^7.0.3",
     "immutable": "^3.8.1",
-    "jquery": "^2.2.3",
+    "jquery": "^3.0.0",
     "minimist": "^1.2.0",
     "mongoose": "^4.4.15",
     "mongoose-auto-increment": "^5.0.1",

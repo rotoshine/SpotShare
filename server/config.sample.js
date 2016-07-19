@@ -9,5 +9,8 @@ module.exports = {
       appSecret: '',
       callbackURL: 'http://localhost:8000/auth/facebook/login/callback'
     }
-  }
+  },
+  fireBaseApiKey: '',
+  fireBaseAuthDomain: '',
+  fireBaseDatabaseURL: ''
 };

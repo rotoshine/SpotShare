@@ -145,6 +145,7 @@ class Spots extends React.Component {
 
   showSpotDetail(spot) {
     this.commentActions.fetchComments(spot._id);
+
     this.setState({
       detailDisplayModal: {
         visible: true,
@@ -159,7 +160,6 @@ class Spots extends React.Component {
     const point = new daum.maps.Point(x, y - $('.navbar').height());
 
     const latLng = proj.coordsFromContainerPoint(point);
-    console.log(latLng);
     const geocoder = new daum.maps.services.Geocoder();
 
     // getting pressed positions address
@@ -223,10 +223,15 @@ class Spots extends React.Component {
     const {addModal, detailDisplayModal, user} = this.state;
     const {spots, spotForm} = this.props;
 
+    const {createComment, removeComment} = this.commentActions;
     return (
       <App>
         <SpotDetailModal visible={detailDisplayModal.visible}
                          spot={detailDisplayModal.displaySpot}
+                         comments={this.props.comments}
+                         onAddComment={createComment}
+                         onRemoveComment={removeComment}
+                         onLike={this.handleSpotLike}
                          onClose={this.handleModalClose} />
         <SpotFormModal visible={addModal.visible}
                        spotForm={spotForm}
@@ -266,7 +271,8 @@ class Spots extends React.Component {
       },
       detailDisplayModal: {
         visible: false,
-        displaySpot: null
+        displaySpot: null,
+        comments: []
       }
     });
   };
@@ -286,7 +292,11 @@ class Spots extends React.Component {
   handleCurrentPositionClick = (e) => {
     e.preventDefault();
     this.setCurrentPosition();
-  }
+  };
+
+  handleSpotLike = () => {
+    // 현재 선택된 스팟에서 id 뽑아서 action 보내기~
+  };
 }
 
 

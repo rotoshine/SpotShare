@@ -10,4 +10,5 @@ router.put('/spots/:spotId', authUtils.isAuthenticate, controller.update);
 router.delete('/spots/:spotId', authUtils.isAuthenticate, controller.remove);
 router.post('/spots/:spotId/like', authUtils.isAuthenticate, controller.like);
 router.post('/spots/:spotId/unlike', authUtils.isAuthenticate, controller.unlike);
+
 module.exports = router;

@@ -9,12 +9,14 @@ export default class Comment extends React.Component {
     const {comment} = this.props;
 
     return (
-      <div>
-        <div className="col-xs-2">
-          {comment.createdBy.name}
+      <div className="row">
+        <div className="col-xs-4">
+          <span className="label label-info">
+            {comment.createdBy.name}
+          </span>
         </div>
-        <div className="col-xs-10">
-          {comment.comment}
+        <div className="col-xs-8">
+          {comment.content}
         </div>
       </div>
     )

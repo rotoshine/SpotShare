@@ -1,81 +1,70 @@
 import React, {PropTypes} from 'react';
-import {Button} from 'react-bootstrap';
 import $ from 'jquery';
 import _ from 'lodash';
-import Immutable from 'immutable';
+
+import {Button} from 'react-bootstrap';
+
 import Comment from './Comment';
 
 export default class CommentBox extends React.Component {
   static propTypes = {
     spotId: PropTypes.string,
     comments: PropTypes.array,
-    onCreateComment: PropTypes.func
+    onAddComment: PropTypes.func.isRequired,
+    onRemoveComment: PropTypes.func.isRequired
   };
 
-  componentDidMount() {
-    this.fetchComments();
-  }
-
-  fetchComments() {
-    this.setState({
-      nowLoading: true
-    }, () => {
-      $.get(`/api/spots/${this.props.spotId}/comments`)
-        .done(result => {
-          this.setState({
-            nowLoading: false,
-            comments: Immutable.List.of(result.comments)
-          });
-        });
-    });
-  }
-
-  createComment(comment) {
-    const data = {
-      spot: this.props.spotId,
-      comment: comment
-    };
-
-    return $.ajax({
-      url: `/api/spots/${this.props.spotId}/comments`,
-      type: 'POST',
-      data: JSON.stringify(data),
-      contentType: 'application/json',
-      dataType: 'json'
-    }).done(() => {
-      this.fetchComments();
-    });
+  createComment(commentText) {
+    const {spotId, onAddComment} = this.props;
+    onAddComment(spotId, commentText);
   }
 
   render() {
     const {comments} = this.props;
     let commentsComponent = [];
-    if (comments.length > 0) {
-      comments.forEach(comment, i => {
+    if (_.isArray(comments) && comments.length > 0) {
+      comments.forEach((comment, i) => {
         commentsComponent.push(
-          <Comment comment={comment} key={i}/>
+          <Comment key={i} comment={comment} />
         );
       });
-    }else{
+    } else {
       commentsComponent.push(
         <div key="empty">댓글이 없습니다.</div>
       );
     }
 
     return (
-      <div>
-        <div className="col-xs-1">
-          <Button>
-            <i className="fa fa-heart"/>
-          </Button>
+      <div className="row">
+        <div className="col-xs-12">
+          <div className="col-xs-2">
+            <div className="btn-group-sm">
+              <button className="btn btn-fab btn-pink">
+                <i className="material-icons">
+                  star
+                </i>
+              </button>
+            </div>
+          </div>
+          <div className="col-xs-8">
+            <input id="comment"
+                   type="text"
+                   className="form-control"
+                   placeholder="이 장소에 대한 생각을 입력해주세요." />
+          </div>
+          <div className="col-xs-2">
+            <div className="pull-right btn-group-sm">
+              <button className="btn btn-primary btn-fab" onClick={this.handleCreateCommentClick}>
+                <i className="material-icons">
+                  comment
+                </i>
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="col-xs-10">
-          <input id="comment" type="text" className="form-control" placeholder="이 장소에 대한 생각을 입력해주세요."/>
+        <div className="col-xs-8 col-xs-offset-2">
+          {commentsComponent}
         </div>
-        <div className="col-xs-1">
-          <Button bsStyle="primary" onClick={this.handleCreateCommentClick}><i className="fa fa-comment"/> </Button>
-        </div>
-        {commentsComponent}
       </div>
     )
   }
@@ -86,7 +75,7 @@ export default class CommentBox extends React.Component {
     const $comment = $('#comment');
     const value = $comment.val();
 
-    if(value !== ''){
+    if (value !== '') {
       this.createComment(value);
       $comment.val('');
     }

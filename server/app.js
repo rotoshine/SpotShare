@@ -108,6 +108,9 @@ app.get('', (req, res) => {
   return res.render('index', {
     title: config.title,
     daumMapApiKey: config.daumMapApiKey,
+    fireBaseApiKey: config.fireBaseApiKey,
+    fireBaseAuthDomain: config.fireBaseAuthDomain,
+    fireBaseDatabaseURL: config.fireBaseDatabaseURL,
     user: JSON.stringify(user)
   });
 });

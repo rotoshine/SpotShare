@@ -35,6 +35,13 @@ export function createSpot(newSpot) {
   };
 }
 
+export function likeSpot(spotId){
+  return {
+    type: Actions.LIKE_SPOT,
+    spotId: spotId
+  };
+}
+
 export function setSpotForm(spotForm){
   return {
     type: Actions.SET_SPOT_FORM,

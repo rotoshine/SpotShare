@@ -7,7 +7,7 @@ export function fetchComments(spotId){
       type: CommentAction.REQUEST_COMMENTS
     });
 
-    return axios.get(`/spots/${spotId}/comments`)
+    return axios.get(`/api/spots/${spotId}/comments`)
       .then((response) => {
         dispatch({
           type: CommentAction.RECIEVE_COMMENTS,
@@ -17,24 +17,28 @@ export function fetchComments(spotId){
   }
 }
 
-export function createComment(comment){
+export function createComment(spotId, content){
   return (dispatch) => {
     dispatch({
       type: CommentAction.CREATE_COMMENT,
-      comment: comment
+      content: content
     });
 
-    return axios.post(`/spots/${comment.spot._id}/comments`);
+    return axios.post(`/api/spots/${spotId}/comments`, {
+      content: content
+    }).then(() => {
+      dispatch(fetchComments(spotId));
+    });
   }
 }
 
-export function removeComment(comment){
+export function removeComment(spotId, commentId){
   return (dispatch) => {
     dispatch({
       type: CommentAction.RECIEVE_COMMENTS,
-      commentId: comment._id
+      commentId: commentId
     });
 
-    return axios.delete(`/spots/${comment.spot._id}/comments/${comment._id}`);
+    return axios.delete(`/api/spots/${comment.spotId}/comments/${commentId}`);
   };
 }
