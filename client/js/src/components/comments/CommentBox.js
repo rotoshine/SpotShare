@@ -46,23 +46,25 @@ export default class CommentBox extends React.Component {
               </button>
             </div>
           </div>
-          <div className="col-xs-8">
-            <input id="comment"
-                   type="text"
-                   className="form-control"
-                   placeholder="이 장소에 대한 생각을 입력해주세요." />
-          </div>
-          <div className="col-xs-2">
-            <div className="pull-right btn-group-sm">
-              <button className="btn btn-primary btn-fab" onClick={this.handleCreateCommentClick}>
-                <i className="material-icons">
-                  comment
-                </i>
-              </button>
+          <form onSubmit={this.handleCreateCommentSubmit}>
+            <div className="col-xs-8">
+              <input id="comment"
+                     type="text"
+                     className="form-control"
+                     placeholder="이 장소에 대한 생각을 입력해주세요." />
             </div>
-          </div>
+            <div className="col-xs-2">
+              <div className="pull-right btn-group-sm">
+                <button type="submit" className="btn btn-primary btn-fab">
+                  <i className="material-icons">
+                    comment
+                  </i>
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
-        <div className="col-xs-8 col-xs-offset-2">
+        <div className="col-xs-10 col-xs-offset-2">
           {commentsComponent}
         </div>
       </div>
@@ -70,7 +72,7 @@ export default class CommentBox extends React.Component {
   }
 
 
-  handleCreateCommentClick = (e) => {
+  handleCreateCommentSubmit = (e) => {
     e.preventDefault();
     const $comment = $('#comment');
     const value = $comment.val();

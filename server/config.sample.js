@@ -8,6 +8,10 @@ module.exports = {
       appId: '',
       appSecret: '',
       callbackURL: 'http://localhost:8000/auth/facebook/login/callback'
+    },
+    kakao: {
+      clientID: '',
+      callbackURL: 'http://localhost:8000/auth/kakao/login/callback'
     }
   },
   fireBaseApiKey: '',

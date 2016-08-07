@@ -16,14 +16,20 @@ export default class App extends React.Component {
   componentDidMount() {
     window.$.material.init();
   }
+
   render() {
     const {user} = this.state;
 
     let userComponent = null;
     let authButton = (
-      <NavItem eventKey={1} href="/auth/facebook/login" className="btn-raised">
-        <i className="fa fa-facebook"/> Login
-      </NavItem>
+      <div>
+        <NavItem eventKey={1} href="/auth/facebook/login" className="btn-raised">
+          <i className="fa fa-facebook"/> Login
+        </NavItem>
+        <NavItem eventKey={2} href="/auth/kakao/login" className="btn-raised">
+          Kakao Login
+        </NavItem>
+      </div>
     );
     if (user.isLogined) {
       userComponent = (

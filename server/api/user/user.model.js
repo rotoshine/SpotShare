@@ -5,13 +5,15 @@ module.exports = (mongoose, plugins) => {
 
   const UserSchema = new Schema({
     name: String,
+    username: String,
     email: { type: String, lowercase: true },
     role: {
       type: String,
       default: 'user'
     },
     provider: String,
-    facebook: {}
+    providerId: Number,
+    originData: {}
   });
 
   UserSchema.plugin(plugins.autoIncrement.plugin, 'User');

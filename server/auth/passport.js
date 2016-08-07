@@ -1,48 +1,47 @@
 'use strict';
 const FacebookStrategy = require('passport-facebook').Strategy;
+const KakaoStrategy = require('passport-kakao').Strategy;
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
-module.exports = (app, passport, config) => {
+function oauthConnect(provider, profile, done) {
+  return User.findOne({
+    provider: provider,
+    providerId: profile.id
+  }, (err, user) => {
+    if (err) {
+      return done(err, null);
+    } else {
+      if (!user) {
+        const newUser = new User({
+          name: profile.displayName,
+          username: profile.username,
+          role: 'user',
+          provider: provider,
+          providerId: profile.id,
+          originData: profile._json
+        });
+        return newUser.save(() => {
+          return done(null, newUser);
+        });
+      } else {
+        user.name = profile.displayName;
+        user.originData = profile._json;
 
-  passport.use(new FacebookStrategy({
-    clientID: config.auth.facebook.appId,
-    clientSecret: config.auth.facebook.appSecret,
-    callbackURL: config.auth.facebook.callbackURL
-  }, (accessToken, refreshToken, profile, done) => {
-    User.findOne({
-      'facebook.id': profile.id
-    }, (err, user) => {
-      if(err){
-        return done(err, null);
-      }else{
-        if(!user){
-          user = new User({
-            name: profile.displayName,
-            username: profile.username,
-            role: 'user',
-            provider: 'facebook',
-            facebook: profile._json
-          });
-          user.save((err) => {
-            if(err){
-              return done(err, null);
-            }else{
-              return done(null, user);
-            }
-          });
-        }else{
-          user.name = profile.displayName;
-          user.facebook = profile._json;
-
-          user.save((err) => {
-            return done(err, user);
-          });
-        }
+        return user.save((err) => {
+          return done(err, user);
+        });
       }
-    })
-  }));
+    }
+  });
+}
 
+const Provider = {
+  FACEBOOK: 'facebook',
+  KAKAO: 'kakao'
+};
+
+module.exports = (app, passport, config) => {
   passport.serializeUser((user, done) => {
     return done(null, user.id);
   });
@@ -52,6 +51,16 @@ module.exports = (app, passport, config) => {
       return done(err, user);
     });
   });
+
+  // facebook setting
+  passport.use(new FacebookStrategy({
+    clientID: config.auth.facebook.appId,
+    clientSecret: config.auth.facebook.appSecret,
+    callbackURL: config.auth.facebook.callbackURL
+  }, (accessToken, refreshToken, profile, done) => {
+    return oauthConnect(Provider.FACEBOOK, profile, done);
+  }));
+
   app.get('/auth/facebook/login', passport.authenticate('facebook', {
     session: true,
     scope: ['public_profile', 'user_about_me', 'user_location']
@@ -60,12 +69,33 @@ module.exports = (app, passport, config) => {
     session: true,
     successRedirect: '/'
   }));
-  app.get('/api/me', passport.authenticate('facebook', { session: true }), (req, res) => {
+
+  // kakao setting
+  if(config.auth.kakao){
+    passport.use(new KakaoStrategy({
+        clientID: config.auth.kakao.clientID,
+        callbackURL: config.auth.kakao.callbackURL
+      },
+      (accessToken, refreshToken, profile, done) => {
+        return oauthConnect(Provider.KAKAO, profile, done);
+      }
+    ));
+
+    app.get('/auth/kakao/login', passport.authenticate('kakao', {
+      session: true
+    }));
+
+    app.get('/auth/kakao/login/callback', passport.authenticate('kakao', {
+      session: true,
+      successRedirect: '/'
+    }));
+  }
+
+  app.get('/api/me', passport.authenticate('facebook', {session: true}), (req, res) => {
     res.json(req.user);
   });
   app.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/');
   });
-
 };
