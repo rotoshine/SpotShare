@@ -9,7 +9,11 @@ export default class Comment extends React.Component {
   render() {
     moment.locale('ko');
     const {comment} = this.props;
+    const {createdBy} = comment;
 
+    if(createdBy === null){
+      return null;
+    }
     return (
       <div className="row">
         <div className="col-xs-3">

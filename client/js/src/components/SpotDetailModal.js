@@ -27,6 +27,11 @@ export default class SpotDetailModal extends React.Component {
       description = '설명이 딱히 없네요.';
     }
 
+    let createdBy = spot.createdBy;
+
+    if(createdBy === null){
+      createdBy = { name: '신원미상' };
+    }
     return (
       <Modal show={visible} onHide={onClose}>
         <Modal.Header closeButton>
@@ -44,7 +49,7 @@ export default class SpotDetailModal extends React.Component {
           <hr/>
           <div className="row" style={{marginTop:-10, marginBottom:10}}>
             <div className="col-xs-offset-2">
-              <span className="label label-primary">{spot.createdBy.name}</span>
+              <span className="label label-primary">{createdBy.name}</span>
               <span>님이 공유한 장소입니다.</span>
             </div>
           </div>

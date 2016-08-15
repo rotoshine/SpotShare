@@ -39,7 +39,7 @@ export default class CommentBox extends React.Component {
         <div className="col-xs-12">
           <div className="col-xs-2">
             <div className="btn-group-sm">
-              <button className="btn btn-fab btn-pink">
+              <button className="btn btn-info btn-fab" onClick={this.handleLike}>
                 <i className="material-icons">
                   star
                 </i>
@@ -81,5 +81,9 @@ export default class CommentBox extends React.Component {
       this.createComment(value);
       $comment.val('');
     }
+  };
+
+  handleLike = (e) => {
+    e.preventDefault();
   };
 }
