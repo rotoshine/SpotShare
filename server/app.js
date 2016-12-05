@@ -22,7 +22,7 @@ const webpackConfig = require('../webpack.config.js');
 const parseArgs = require('minimist');
 
 console.log('loaded config', config);
-const isDevMode = process.env.NODE_ENV === 'production';
+const isDevMode = process.env.NODE_ENV !== 'production';
 
 // webpack setting
 if(isDevMode){
