@@ -5,7 +5,7 @@
   "scripts": {
     "nodemon": "nodemon server/app.js --dev NODE_ENV=development",
     "dev-start": "node server/app.js --dev NODE_ENV=development",
-    "start": "webpack && node server/app.js NODE_ENV=production",
+    "start": "NODE_ENV=production webpack && node server/app.js",
     "lint": "eslint src",
     "prenodemon": "npm install",
     "preinstall": "npm prune",
