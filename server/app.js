@@ -21,11 +21,11 @@ const webpack = require('webpack');
 const webpackConfig = require('../webpack.config.js');
 const parseArgs = require('minimist');
 
-
-const argv = parseArgs(process.argv.slice(2));
+console.log('loaded config', config);
+const isDevMode = process.env.NODE_ENV === 'production';
 
 // webpack setting
-if(argv.dev){
+if(isDevMode){
   const compiler = webpack(webpackConfig);
   app.use(webpackMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
