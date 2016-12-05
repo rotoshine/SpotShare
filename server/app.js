@@ -19,14 +19,14 @@ const webpackMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const webpack = require('webpack');
 const webpackConfig = require('../webpack.config.js');
-const parseArgs = require('minimist');
+const argv = require('minimist')(process.argv.slice(2));
 
-console.log('loaded config', config);
-console.log(process.env.NODE_ENV);
-const isDevMode = process.env.NODE_ENV !== 'production';
+console.log(argv);
+const isDevMode = argv.mode !== 'production';
 
 // webpack setting
 if(isDevMode){
+  console.log('Development Mode Run.');
   const compiler = webpack(webpackConfig);
   app.use(webpackMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
@@ -37,6 +37,8 @@ if(isDevMode){
   app.use(webpackHotMiddleware(compiler, {
     log: console.log
   }));
+}else{
+  console.log('Production Mode Run.');
 }
 
 // middleware loading

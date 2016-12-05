@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "description": "지도 기반 장소 공유 웹 애플리케이션",
   "scripts": {
-    "nodemon": "nodemon server/app.js --dev NODE_ENV=development",
-    "dev-start": "node server/app.js --dev NODE_ENV=development",
-    "start": "NODE_ENV=production webpack && node server/app.js",
+    "nodemon": "nodemon server/app.js --mode development",
+    "dev-start": "node server/app.js --mode development",
+    "start": "webpack --mode production && node server/app.js --mode production",
     "lint": "eslint src",
     "prenodemon": "npm install",
     "preinstall": "npm prune",

@@ -1,19 +1,30 @@
 require('dotenv').config();
 
-var path = require('path');
-var webpack = require('webpack');
+const argv = require('minimist')(process.argv.slice(2));
+const path = require('path');
+const webpack = require('webpack');
 
-var entry = [
+let entry = [
   './client/js/src/index'
 ];
 
-if(process.env !== 'production'){
+let loaders = ['babel'];
+
+let plugins = [];
+if(argv.mode !== 'production'){
   entry = [
     'webpack/hot/dev-server',
     'webpack-hot-middleware/client',
     './client/js/src/index'
   ];
+  loaders = ['react-hot', 'babel'];
+  plugins = [
+    new webpack.HotModuleReplacementPlugin()
+  ];
+  console.log('Webpack hot loader enable.');
 }
+
+
 
 module.exports = {
   devtool: 'eval',
@@ -23,14 +34,12 @@ module.exports = {
     filename: 'bundle.js',
     publicPath: '/js/dist/'
   },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ],
+  plugins: plugins,
   module: {
     loaders: [
       {
         test: /\.js$/,
-        loaders: ['react-hot', 'babel'],
+        loaders: loaders,
         include: path.join(__dirname, 'client/js/src')
       }
     ]
