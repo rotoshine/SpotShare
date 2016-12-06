@@ -68,7 +68,7 @@
     "passport-facebook": "^2.1.0",
     "passport-kakao": "0.0.4",
     "react": "^15.0.0",
-    "react-bootstrap": "^0.29.3",
+    "react-bootstrap": "0.30.7",
     "react-dom": "^15.0.0",
     "react-hammerjs": "^0.4.6",
     "react-redux": "^4.4.5",
