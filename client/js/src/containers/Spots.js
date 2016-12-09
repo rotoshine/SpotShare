@@ -192,7 +192,7 @@ class Spots extends React.Component {
 
     return new Promise((resolve) => {
       // geolocation 사용이 가능한 경우
-      if ('geolocation' in navigator) {
+      /*if ('geolocation' in navigator) {
         navigator.geolocation.getCurrentPosition((position) => {
           const {latitude, longitude} = position.coords;
           return resolve({
@@ -200,12 +200,12 @@ class Spots extends React.Component {
             longitude: longitude
           });
         });
-      } else {
+      } else {*/
         return resolve({
           latitude: DEFAULT_LATITUDE,
           longitude: DEFAULT_LONGITUDE
         });
-      }
+      //}
     });
 
   }
