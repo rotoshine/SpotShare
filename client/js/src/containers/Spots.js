@@ -193,22 +193,20 @@ class Spots extends React.Component {
     return new Promise((resolve) => {
       // geolocation 사용이 가능한 경우
       if ('geolocation' in navigator) {
-        // chrome에선 https가 아니면 이 부분에서 에러가 발생한다. 방어코드
-        try {
-          navigator.geolocation.getCurrentPosition((position) => {
+        navigator.geolocation.getCurrentPosition((position) => {
+          if (_.isObject(position)) {
             const {latitude, longitude} = position.coords;
             return resolve({
               latitude: latitude,
               longitude: longitude
             });
-          });
-        } catch (e) {
-          console.error(e);
-          return resolve({
-            latitude: DEFAULT_LATITUDE,
-            longitude: DEFAULT_LONGITUDE
-          });
-        }
+          } else {
+            return resolve({
+              latitude: DEFAULT_LATITUDE,
+              longitude: DEFAULT_LONGITUDE
+            });
+          }
+        });
       } else {
         return resolve({
           latitude: DEFAULT_LATITUDE,
