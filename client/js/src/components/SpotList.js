@@ -6,12 +6,13 @@ import {Panel, Button} from 'react-bootstrap';
 export default class SpotList extends React.Component {
   static propTypes = {
     spots: PropTypes.array.isRequired,
+    useCurrentPosition: PropTypes.bool,
     onSpotClick: PropTypes.func.isRequired,
     onCurrentPositionClick: PropTypes.func.isRequired
   };
 
   render() {
-    const {spots, onSpotClick} = this.props;
+    const {spots, useCurrentPosition, onSpotClick} = this.props;
 
     let spotListComponents = [];
 
@@ -31,13 +32,20 @@ export default class SpotList extends React.Component {
       }
     }
 
+    let currentPositionButton = null;
+
+    if(useCurrentPosition){
+      currentPositionButton = (
+        <Button size="xs" onClick={this.props.onCurrentPositionClick}>
+          <i className="fa fa-location-arrow"/> 현재 위치 찾기</Button>
+      );
+    }
     return (
       <Panel>
         <ul className="list-unstyled">
           {spotListComponents}
         </ul>
-        <Button size="xs" onClick={this.props.onCurrentPositionClick}>
-          <i className="fa fa-location-arrow"/> 현재 위치 찾기</Button>
+        {currentPositionButton}
       </Panel>
     )
   }

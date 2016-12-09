@@ -22,10 +22,10 @@ export default class SpotFormModal extends React.Component {
         <Modal.Body>
           <Form horizontal onSubmit={onSubmit}>
             <FormGroup controlId="spotName">
-              <Col componentClass={ControlLabel} xs={6} sm={2}>
+              <Col componentClass={ControlLabel} xs={3} sm={2}>
                 스팟 이름
               </Col>
-              <Col xs={6} sm={10}>
+              <Col xs={9} sm={10}>
                 <FormControl type="text"
                              placeholder="스팟의 이름을 입력해주세요."
                              value={spotForm.spotName}
@@ -36,10 +36,10 @@ export default class SpotFormModal extends React.Component {
               </Col>
             </FormGroup>
             <FormGroup controlId="description">
-              <Col componentClass={ControlLabel} xs={6} sm={2}>
+              <Col componentClass={ControlLabel} xs={3} sm={2}>
                 스팟 설명
               </Col>
-              <Col xs={6} sm={10}>
+              <Col xs={9} sm={10}>
                 <FormControl componentClass="textarea"
                              value={spotForm.description}
                              onChange={(e) => {
@@ -47,25 +47,23 @@ export default class SpotFormModal extends React.Component {
                              }}/>
               </Col>
             </FormGroup>
-            <div className="form-group">
-              <label htmlFor="address" className="col-sm-2 col-xs-6 control-label">
+            <FormGroup>
+              <label htmlFor="address" className="col-sm-2 col-xs-3 control-label">
                 주소
               </label>
-              <Col sm={10}>
+              <Col sm={10} xs={9}>
                 <input id="address"
                        type="text"
                        value={spotForm.address}
                        className="form-control"
                        readOnly/>
               </Col>
-            </div>
+            </FormGroup>
 
             <FormGroup>
-              <Col smOffset={2} sm={10}>
-                <Button bsStyle="primary" type="submit">
-                  등록하기
-                </Button>
-              </Col>
+              <Button bsStyle="primary" type="submit" style={{width:'100%'}}>
+                등록하기
+              </Button>
             </FormGroup>
           </Form>
         </Modal.Body>

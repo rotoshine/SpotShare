@@ -42,7 +42,8 @@ class Spots extends React.Component {
       displaySpot: null
     },
     height: 0,
-    user: JSON.parse(document.getElementById('user').innerHTML)
+    user: JSON.parse(document.getElementById('user').innerHTML),
+    useCurrentPosition: location.protocol === 'https'
   };
 
   constructor(props) {
@@ -248,11 +249,14 @@ class Spots extends React.Component {
         <Hammer onPress={this.handlePress}>
           <div className="map-wrapper">
             <div className="map" id="spot-map" style={style}></div>
-            <div className="map-control col-md-4 hidden-xs">
+            { /* hammer 영역에서 빼자 */ }
+            <div className="map-control col-md-4 col-xs-10">
               <Well>{user.isLogined ?
                 '스팟을 등록하려면 해당 위치를 길게 누르세요' :
-                '스팟을 등록하려면 로그인 하세요.'}.</Well>
+                '스팟을 등록하려면 로그인 하세요.'}.
+              </Well>
               <SpotList spots={spots}
+                        useCurrentPosition={this.state.useCurrentPosition}
                         onSpotClick={this.handleSpotListClick}
                         onCurrentPositionClick={this.handleCurrentPositionClick}/>
             </div>
