@@ -43,7 +43,7 @@ class Spots extends React.Component {
     },
     height: 0,
     user: JSON.parse(document.getElementById('user').innerHTML),
-    useCurrentPosition: location.protocol === 'https'
+    useCurrentPosition: location.protocol === 'https:'
   };
 
   constructor(props) {
