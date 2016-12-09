@@ -8,7 +8,7 @@ import Comment from './Comment';
 
 export default class CommentBox extends React.Component {
   static propTypes = {
-    spotId: PropTypes.string,
+    spotId: PropTypes.number,
     comments: PropTypes.array,
     onAddComment: PropTypes.func.isRequired,
     onRemoveComment: PropTypes.func.isRequired

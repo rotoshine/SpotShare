@@ -9,7 +9,7 @@ let entry = [
 ];
 
 let loaders = ['babel'];
-
+let devtool = 'evel';
 let plugins = [];
 if(argv.mode !== 'production'){
   entry = [
@@ -22,12 +22,26 @@ if(argv.mode !== 'production'){
     new webpack.HotModuleReplacementPlugin()
   ];
   console.log('Webpack hot loader enable.');
+}else{
+  devtool = 'source-map';
+  plugins = [
+    new webpack.optimize.UglifyJsPlugin(),
+    new webpack.optimize.DedupePlugin(),
+    new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /ko/),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'process.env': {
+          'NODE_ENV': JSON.stringify('production')
+        }
+      }
+    })
+  ]
 }
 
 
 
 module.exports = {
-  devtool: 'eval',
+  devtool: devtool,
   entry: entry,
   output: {
     path: path.join(__dirname, 'client/js/dist'),
