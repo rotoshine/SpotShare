@@ -192,27 +192,37 @@ class Spots extends React.Component {
     const DEFAULT_LONGITUDE = 127.11770256831429;
 
     return new Promise((resolve) => {
-      // geolocation 사용이 가능한 경우
-      if ('geolocation' in navigator && this.state.useCurrentPosition) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          if (_.isObject(position)) {
-            const {latitude, longitude} = position.coords;
-            return resolve({
-              latitude: latitude,
-              longitude: longitude
-            });
-          } else {
-            return resolve({
-              latitude: DEFAULT_LATITUDE,
-              longitude: DEFAULT_LONGITUDE
-            });
-          }
-        });
-      } else {
+      const defaultHandler = () => {
         return resolve({
           latitude: DEFAULT_LATITUDE,
           longitude: DEFAULT_LONGITUDE
         });
+      };
+
+      try{
+        // geolocation 사용이 가능한 경우
+        if ('geolocation' in navigator && this.state.useCurrentPosition) {
+          return navigator.geolocation.getCurrentPosition((position) => {
+            if (_.isObject(position)) {
+              const {latitude, longitude} = position.coords;
+              return resolve({
+                latitude: latitude,
+                longitude: longitude
+              });
+            } else {
+              defaultHandler();
+            }
+          }, () => {
+            alert('gps를 켜주세요.');
+            defaultHandler();
+          }, {
+            timeout: 1000 * 3
+          });
+        } else {
+          defaultHandler();
+        }
+      }catch(e) {
+        defaultHandler();
       }
     });
 
