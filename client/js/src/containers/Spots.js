@@ -3,20 +3,18 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import $ from 'jquery';
 import _ from 'lodash';
-import Hammer from 'react-hammerjs';
 import Immutable from 'immutable';
 
 import * as SpotActionCreators from '../actions/SpotsActionCreators';
 import * as CommentActionCreators from '../actions/CommentActionCreators';
 
-import {Button, Well, Panel, Form, FormGroup, FormControl, Input, ControlLabel, Modal, Row, Col} from 'react-bootstrap';
+import {Well, Input} from 'react-bootstrap';
 
 
 import App from '../App';
 import SpotList from '../components/SpotList';
 import SpotFormModal from '../components/SpotFormModal';
 import SpotDetailModal from '../components/SpotDetailModal';
-import CommentBox from '../components/comments/CommentBox';
 
 
 class Spots extends React.Component {
@@ -69,7 +67,10 @@ class Spots extends React.Component {
       let container = document.getElementById('spot-map');
       let options = {
         center: new daum.maps.LatLng(latLng.latitude, latLng.longitude), //지도의 중심좌표.
-        level: 3 //지도의 레벨(확대, 축소 정도)
+        level: 3,
+        draggable: true,
+        scrollwheel: true,
+        disableDoubleClickZoom: true
       };
 
       this.map = new daum.maps.Map(container, options);
@@ -89,6 +90,9 @@ class Spots extends React.Component {
       });
       event.addListener(map, 'zoom_changed', () => {
         this.fetchSpots();
+      });
+      event.addListener(map, 'dblclick', (mouseEvent) => {
+        this.showSpotFormModal(mouseEvent.latLng);
       });
     }
   }
@@ -155,12 +159,8 @@ class Spots extends React.Component {
     });
   }
 
-  showSpotFormModal(x, y) {
+  showSpotFormModal(latLng) {
     // getting pressed position
-    const proj = this.map.getProjection();
-    const point = new daum.maps.Point(x, y - $('.navbar').height());
-
-    const latLng = proj.coordsFromContainerPoint(point);
     const geocoder = new daum.maps.services.Geocoder();
 
     // getting pressed positions address
@@ -232,6 +232,7 @@ class Spots extends React.Component {
     const {spots, spotForm} = this.props;
 
     const {createComment, removeComment} = this.commentActions;
+
     return (
       <App>
         <SpotDetailModal visible={detailDisplayModal.visible}
@@ -246,32 +247,22 @@ class Spots extends React.Component {
                        onFormUpdate={this.actions.updateSpotForm}
                        onClose={this.handleModalClose}
                        onSubmit={this.handleSpotFormSubmit}/>
-        <Hammer onPress={this.handlePress}>
-          <div className="map-wrapper">
-            <div className="map" id="spot-map" style={style}></div>
-            { /* hammer 영역에서 빼자 */ }
-            <div className="map-control col-md-4 col-xs-10">
-              <Well>{user.isLogined ?
-                '스팟을 등록하려면 해당 위치를 길게 누르세요' :
-                '스팟을 등록하려면 로그인 하세요.'}.
-              </Well>
-              <SpotList spots={spots}
-                        useCurrentPosition={this.state.useCurrentPosition}
-                        onSpotClick={this.handleSpotListClick}
-                        onCurrentPositionClick={this.handleCurrentPositionClick}/>
-            </div>
+        <div className="map-wrapper">
+          <div className="map" id="spot-map" style={style}></div>
+          <div className="map-control col-md-4 col-xs-10">
+            <Well>{user.isLogined ?
+              '스팟을 등록하려면 해당 위치를 더블클릭 하세요' :
+              '스팟을 등록하려면 로그인 하세요.'}.
+            </Well>
+            <SpotList spots={spots}
+                      useCurrentPosition={this.state.useCurrentPosition}
+                      onSpotClick={this.handleSpotListClick}
+                      onCurrentPositionClick={this.handleCurrentPositionClick}/>
           </div>
-        </Hammer>
+        </div>
       </App>
     );
   }
-
-  handlePress = (e) => {
-    if (this.state.user.isLogined) {
-      const {x, y} = e.pointers[0];
-      this.showSpotFormModal(x, y);
-    }
-  };
 
   handleModalClose = () => {
     this.setState({
