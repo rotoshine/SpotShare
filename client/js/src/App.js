@@ -10,7 +10,8 @@ export default class App extends React.Component {
   };
 
   state = {
-    user: JSON.parse(document.getElementById('user').innerHTML)
+    user: JSON.parse(document.getElementById('user').innerHTML),
+    title: $('title').html()
   };
 
   componentDidMount() {
@@ -53,7 +54,7 @@ export default class App extends React.Component {
         <Navbar style={{marginBottom:0}} inverse>
           <Navbar.Header>
             <Navbar.Brand>
-              <a href="#">Board Spot!</a>
+              <a href="#">{this.state.title}</a>
             </Navbar.Brand>
             <Navbar.Toggle />
           </Navbar.Header>
