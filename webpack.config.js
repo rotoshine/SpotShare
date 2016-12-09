@@ -30,9 +30,7 @@ if(argv.mode !== 'production'){
     new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /ko/),
     new webpack.DefinePlugin({
       'process.env': {
-        'process.env': {
-          'NODE_ENV': JSON.stringify('production')
-        }
+          'NODE_ENV': 'production'
       }
     })
   ]
