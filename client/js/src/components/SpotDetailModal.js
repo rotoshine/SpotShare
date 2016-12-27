@@ -15,12 +15,6 @@ export default class SpotDetailModal extends React.Component {
     onLike: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired
   };
-
-  componentWillReceiveProps(nextProps) {
-    if(!this.props.visible && nextProps.visible){
-      this.renderRoadView();
-    }
-  }
   
   renderRoadView() {
     const {spot} = this.props;

@@ -156,6 +156,8 @@ class Spots extends React.Component {
         visible: true,
         displaySpot: spot
       }
+    }, () => {
+      this.refs.spotDetailModal.renderRoadView();
     });
   }
 
@@ -199,7 +201,7 @@ class Spots extends React.Component {
         });
       };
 
-      try{
+      try {
         // geolocation 사용이 가능한 경우
         if ('geolocation' in navigator && this.state.useCurrentPosition) {
           return navigator.geolocation.getCurrentPosition((position) => {
@@ -221,7 +223,7 @@ class Spots extends React.Component {
         } else {
           defaultHandler();
         }
-      }catch(e) {
+      } catch (e) {
         defaultHandler();
       }
     });
@@ -245,7 +247,8 @@ class Spots extends React.Component {
 
     return (
       <App>
-        <SpotDetailModal visible={detailDisplayModal.visible}
+        <SpotDetailModal ref="spotDetailModal"
+                         visible={detailDisplayModal.visible}
                          spot={detailDisplayModal.displaySpot}
                          isLogin={user.isLogin}
                          comments={this.props.comments}
