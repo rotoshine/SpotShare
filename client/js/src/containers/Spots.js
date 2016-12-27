@@ -247,6 +247,7 @@ class Spots extends React.Component {
       <App>
         <SpotDetailModal visible={detailDisplayModal.visible}
                          spot={detailDisplayModal.displaySpot}
+                         isLogin={user.isLogin}
                          comments={this.props.comments}
                          onAddComment={createComment}
                          onRemoveComment={removeComment}
@@ -260,7 +261,7 @@ class Spots extends React.Component {
         <div className="map-wrapper">
           <div className="map" id="spot-map" style={style}></div>
           <div className="map-control col-md-4 col-xs-10">
-            <Well>{user.isLogined ?
+            <Well>{user.isLogin ?
               '스팟을 등록하려면 해당 위치를 더블클릭 하세요' :
               '스팟을 등록하려면 로그인 하세요.'}.
             </Well>

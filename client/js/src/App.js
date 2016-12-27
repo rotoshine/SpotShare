@@ -34,7 +34,7 @@ export default class App extends React.Component {
       )
     ];
 
-    if (user.isLogined) {
+    if (user.isLogin) {
       userComponent = (
         <NavItem>
           <span className="label label-info">Hello {user.name}!</span>

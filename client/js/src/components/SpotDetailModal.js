@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import _ from 'lodash';
 
 import {Modal} from 'react-bootstrap';
 import CommentBox from './comments/CommentBox';
@@ -7,6 +8,7 @@ export default class SpotDetailModal extends React.Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
     spot: PropTypes.object,
+    isLogin: PropTypes.bool.isRequired,
     comments: PropTypes.array,
     onAddComment: PropTypes.func.isRequired,
     onRemoveComment: PropTypes.func.isRequired,
@@ -14,8 +16,30 @@ export default class SpotDetailModal extends React.Component {
     onClose: PropTypes.func.isRequired
   };
 
+  componentWillReceiveProps(nextProps) {
+    if(!this.props.visible && nextProps.visible){
+      this.renderRoadView();
+    }
+  }
+  
+  renderRoadView() {
+    const {spot} = this.props;
+
+    if(_.isObject(spot)) {
+      const roadViewContainer = document.getElementById('road-view');
+      const roadView = new daum.maps.Roadview(roadViewContainer);
+      const roadViewClient = new daum.maps.RoadviewClient();
+
+      const position = new daum.maps.LatLng(spot.geo[0], spot.geo[1]);
+
+      roadViewClient.getNearestPanoId(position, 50, (panoId) => {
+        roadView.setPanoId(panoId, position);
+      });
+    }
+  }
+  
   render() {
-    const {spot, visible, comments, onClose, onAddComment, onRemoveComment} = this.props;
+    const {spot, visible, isLogin, comments, onClose, onAddComment, onRemoveComment} = this.props;
 
     if (spot === null) {
       return null;
@@ -53,7 +77,10 @@ export default class SpotDetailModal extends React.Component {
               <span>님이 공유한 장소입니다.</span>
             </div>
           </div>
+          <div style={{width:'100%', height: 300}} id="road-view">
+          </div>
           <CommentBox spotId={spot._id}
+                      isLogin={isLogin}
                       comments={comments}
                       onAddComment={onAddComment}
                       onRemoveComment={onRemoveComment}/>

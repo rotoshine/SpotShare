@@ -65,7 +65,25 @@ exports.save = (req, res) => {
 };
 
 exports.update = (req, res) => {
+  let body = req.body;
+  const spotId = req.params.spotId;
+  return Spot.findById(spotId, (err, spot) => {
+    return handleError(err, res, () => {
+      if(spot !== null){
+        spot.spotName = body.spotName;
+        spot.spotDetail = body.spotDetail;
 
+        return spot.save((err) => {
+          if(err){
+            console.error(err);
+          }
+          return res.status(200).json({
+            result: 'success'
+          });
+        });
+      }
+    });
+  });
 };
 
 exports.remove = (req, res) => {

@@ -4,6 +4,11 @@ import * as CommentAction from './commentActions';
 export function fetchComments(spotId){
   return (dispatch) => {
     dispatch({
+      type: CommentAction.RESET_COMMENTS,
+      comments: []
+    });
+
+    dispatch({
       type: CommentAction.REQUEST_COMMENTS
     });
 

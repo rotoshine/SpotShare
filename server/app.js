@@ -99,12 +99,13 @@ app.set('view engine', 'handlebars');
 
 app.get('', (req, res) => {
   let user = {
-    isLogined: false
+    isLogin: false
   };
   if(req.user){
     user = {
-      isLogined: true,
-      name: req.user.name
+      isLogin: true,
+      name: req.user.name,
+      provider: req.user.provider
     }
   }
 
