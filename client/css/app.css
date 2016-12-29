@@ -3,11 +3,6 @@ html, body, .root {
   height: 100%;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-}
-
 .navbar-collapse {
   z-index: 100;
   background-color: #3f51b5;
