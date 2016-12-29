@@ -8,11 +8,12 @@ export default class SpotList extends React.Component {
     spots: PropTypes.array.isRequired,
     useCurrentPosition: PropTypes.bool,
     onSpotClick: PropTypes.func.isRequired,
+    onMouseOver: PropTypes.func.isRequired,
     onCurrentPositionClick: PropTypes.func.isRequired
   };
 
   render() {
-    const {spots, useCurrentPosition, onSpotClick} = this.props;
+    const {spots, useCurrentPosition, onSpotClick, onMouseOver} = this.props;
 
     let spotListComponents = [];
 
@@ -20,7 +21,19 @@ export default class SpotList extends React.Component {
       spots.forEach((spot, i) => {
         spotListComponents.push(
           <li key={i}>
-            <a href="#" onClick={onSpotClick.bind(this, spot)}>{spot.spotName}</a>
+            <a href="#" onClick={onSpotClick.bind(this, spot)} onMouseOver={onMouseOver.bind(this, spot._id)}>
+              <div className="spot-item">
+                <div className="spot-photo" />
+                <div className="spot-detail">
+                  <h3 className="spot-name">
+                    {spot.spotName}
+                  </h3>
+                  <div className="spot-hashtags">
+                    #테스트
+                  </div>
+                </div>
+              </div>
+            </a>
           </li>
         );
       });
@@ -41,12 +54,12 @@ export default class SpotList extends React.Component {
       );
     }
     return (
-      <Panel>
+      <div className="spot-list">
         <ul className="list-unstyled">
           {spotListComponents}
         </ul>
         {currentPositionButton}
-      </Panel>
+      </div>
     )
   }
 }

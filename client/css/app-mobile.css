@@ -1,0 +1,34 @@
+@media screen and (max-width:768px){
+  .flex-container {
+    flex-direction: column;
+  }
+  .map-wrapper {
+    top: 50px;
+  }
+  .map-wrapper .map-control{
+    width: 100%;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .map-wrapper .map{
+    width: 100%;
+  }
+
+  .spot-list .spot-item .spot-photo {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ccc;
+  }
+
+  .spot-list .spot-item h3 {
+    font-size: 1em;
+  }
+
+
+  .map-tooltip {
+    right: 10px;
+    top: 10px;
+  }
+}

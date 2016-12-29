@@ -51,6 +51,8 @@ class Spots extends React.Component {
 
     this.actions = bindActionCreators(SpotActionCreators, dispatch);
     this.commentActions = bindActionCreators(CommentActionCreators, dispatch);
+
+    this.markers = [];
   }
 
   componentDidMount() {
@@ -74,7 +76,7 @@ class Spots extends React.Component {
       };
 
       this.map = new daum.maps.Map(container, options);
-      this.markers = Immutable.List.of();
+      this.markers = [];
 
       this.fetchSpots();
       this.registEvents();
@@ -92,7 +94,11 @@ class Spots extends React.Component {
         this.fetchSpots();
       });
       event.addListener(map, 'dblclick', (mouseEvent) => {
-        this.showSpotFormModal(mouseEvent.latLng);
+        if(this.state.user.isLogin){
+          this.showSpotFormModal(mouseEvent.latLng);
+        }else{
+          alert('로그인 후 등록 가능합니다.');
+        }
       });
     }
   }
@@ -123,21 +129,39 @@ class Spots extends React.Component {
     });
   }
 
+  removeRenderedMarkers() {
+    // 기존에 렌더링 된 마커 삭제
+    this.markers.forEach((marker) => {
+      marker.infoWindow.close();
+      marker.setMap(null);
+    });
+    this.markers = [];
+  }
   renderMarkers() {
-    this.markers = Immutable.List.of();
-
+    this.removeRenderedMarkers();
     const {spots} = this.props;
 
     spots.forEach(spot => {
       if (_.isArray(spot.geo) && spot.geo.length === 2) {
+        const markerPosition = new daum.maps.LatLng(spot.geo[0], spot.geo[1]);
         let marker = new daum.maps.Marker({
-          position: new daum.maps.LatLng(spot.geo[0], spot.geo[1]),
+          position: markerPosition,
           clickable: true
         });
 
         marker.spotId = spot._id;
 
         marker.setMap(this.map);
+
+        const infoWindow = new daum.maps.InfoWindow({
+          position: markerPosition,
+          content: `<div class="marker-info-window">${spot.spotName}</div>`,
+          zIndex: 3
+        });
+
+        infoWindow.open(this.map, marker);
+        marker.infoWindow = infoWindow;
+
         this.markers.push(marker);
 
         // marker 이벤트 등록
@@ -238,8 +262,6 @@ class Spots extends React.Component {
   }
 
   render() {
-    let style = {width: '100%', height: this.state.height};
-
     const {addModal, detailDisplayModal, user} = this.state;
     const {spots, spotForm} = this.props;
 
@@ -261,16 +283,17 @@ class Spots extends React.Component {
                        onFormUpdate={this.actions.updateSpotForm}
                        onClose={this.handleModalClose}
                        onSubmit={this.handleSpotFormSubmit}/>
-        <div className="map-wrapper">
-          <div className="map" id="spot-map" style={style}></div>
-          <div className="map-control col-md-4 col-xs-10">
-            <Well>{user.isLogin ?
-              '스팟을 등록하려면 해당 위치를 더블클릭 하세요' :
-              '스팟을 등록하려면 로그인 하세요.'}.
-            </Well>
+        <div className="map-wrapper flex-container">
+          <Well className="map-tooltip">{user.isLogin ?
+            '스팟을 등록하려면 해당 위치를 더블클릭 하세요' :
+            '스팟을 등록하려면 로그인 하세요.'}.
+          </Well>
+          <div className="map" id="spot-map" />
+          <div className="map-control">
             <SpotList spots={spots}
                       useCurrentPosition={this.state.useCurrentPosition}
                       onSpotClick={this.handleSpotListClick}
+                      onMouseOver={this.handleMouseOver}
                       onCurrentPositionClick={this.handleCurrentPositionClick}/>
           </div>
         </div>
@@ -312,6 +335,12 @@ class Spots extends React.Component {
 
   handleSpotLike = () => {
     // 현재 선택된 스팟에서 id 뽑아서 action 보내기~
+  };
+
+  handleMouseOver = (spotId) => {
+    // 현재 마커중 찾아서 표시하기
+
+    console.log(spotId);
   };
 }
 
