@@ -1,19 +1,20 @@
 import React, {PropTypes} from 'react';
 import _ from 'lodash';
 
-import {Panel, Button} from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
 
-export default class SpotList extends React.Component {
+export default class SimpleSpotList extends React.Component {
   static propTypes = {
     spots: PropTypes.array.isRequired,
     useCurrentPosition: PropTypes.bool,
     onSpotClick: PropTypes.func.isRequired,
     onMouseOver: PropTypes.func.isRequired,
+    onMouseOut: PropTypes.func.isRequired,
     onCurrentPositionClick: PropTypes.func.isRequired
   };
 
   render() {
-    const {spots, useCurrentPosition, onSpotClick, onMouseOver} = this.props;
+    const {spots, useCurrentPosition, onSpotClick, onMouseOver, onMouseOut} = this.props;
 
     let spotListComponents = [];
 
@@ -21,9 +22,11 @@ export default class SpotList extends React.Component {
       spots.forEach((spot, i) => {
         spotListComponents.push(
           <li key={i}>
-            <a href="#" onClick={onSpotClick.bind(this, spot)} onMouseOver={onMouseOver.bind(this, spot._id)}>
+            <a href="#" onClick={onSpotClick.bind(this, spot)}
+               onMouseOver={onMouseOver.bind(this, spot._id)}
+               onMouseOut={onMouseOut.bind(this, spot._id)}>
               <div className="spot-item">
-                <div className="spot-photo" />
+                <div className="spot-photo"/>
                 <div className="spot-detail">
                   <h3 className="spot-name">
                     {spot.spotName}
@@ -47,7 +50,7 @@ export default class SpotList extends React.Component {
 
     let currentPositionButton = null;
 
-    if(useCurrentPosition){
+    if (useCurrentPosition) {
       currentPositionButton = (
         <Button size="xs" onClick={this.props.onCurrentPositionClick}>
           <i className="fa fa-location-arrow"/> 현재 위치 찾기</Button>

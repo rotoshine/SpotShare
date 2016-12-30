@@ -1,6 +1,9 @@
 module.exports = {
   mongo: 'mongodb://localhost/spots',
-  daumMapApiKey: '',
+  map: {
+    apiKey: '',
+    markerUrl: '/images/food_tool.svg'
+  },
   title: '각종 스팟 공유',
   sessionSecret: '',
   auth: {

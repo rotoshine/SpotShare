@@ -5,16 +5,16 @@ import { Provider } from 'react-redux';
 
 import configureStore from './store/configureStore';
 // containers
-import Spots from './containers/Spots';
-
+import SpotMapContainer from './containers/SpotMapContainer';
+import SpotListStyleContainer from './containers/SpotListStyleContainer';
 const store = configureStore();
 
 const rootInstance = ReactDOM.render(
   (
     <Provider store={store}>
       <Router history={browserHistory}>
-        <Route path="/" component={Spots}/>
-        <Route path="/spots/:spotId" component={Spots} />
+        <Route path="/" component={SpotMapContainer}/>
+        <Route path="/spots" component={SpotListStyleContainer} />
       </Router>
     </Provider>
   ), document.getElementById('root'));

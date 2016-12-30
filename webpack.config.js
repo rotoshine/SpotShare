@@ -9,7 +9,7 @@ let entry = [
 ];
 
 let loaders = ['babel'];
-let devtool = 'evel';
+let devtool = '#cheap-module-eval-source-map';
 let plugins = [];
 if(argv.mode !== 'production'){
   entry = [
@@ -19,7 +19,8 @@ if(argv.mode !== 'production'){
   ];
   loaders = ['react-hot', 'babel'];
   plugins = [
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /ko/),
   ];
   console.log('Webpack hot loader enable.');
 }else{

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/bootstrap-material-design.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/css/ripples.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/css/app-mobile.css">
 </head>
@@ -30,7 +30,9 @@
     firebase.initializeApp(config);
 </script>
 <script type="application/json" id="user">{{{user}}}</script>
-<script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey={{daumMapApiKey}}&libraries=services"></script>
+<script type="application/json" id="mapConfig">{{{map}}}</script>
+<script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey={{mapApiKey}}&libraries=services,clusterer"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1fEJUhHgd20ndREx2ynzJ1vMfKJYU2Rc"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/js/material.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/0.5.10/js/ripples.min.js"></script>

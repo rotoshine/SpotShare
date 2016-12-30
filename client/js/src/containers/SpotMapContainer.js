@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import $ from 'jquery';
 import _ from 'lodash';
-import Immutable from 'immutable';
 
 import * as SpotActionCreators from '../actions/SpotsActionCreators';
 import * as CommentActionCreators from '../actions/CommentActionCreators';
@@ -12,12 +11,12 @@ import {Well, Input} from 'react-bootstrap';
 
 
 import App from '../App';
-import SpotList from '../components/SpotList';
+import SimpleSpotList from '../components/SimpleSpotList';
 import SpotFormModal from '../components/SpotFormModal';
 import SpotDetailModal from '../components/SpotDetailModal';
 
-
-class Spots extends React.Component {
+const CLUSTERER_LEVEL = 5;
+class SpotMapContainer extends React.Component {
   static propTypes = {
     nowLoading: PropTypes.bool.isRequired,
     spots: PropTypes.array.isRequired,
@@ -53,6 +52,25 @@ class Spots extends React.Component {
     this.commentActions = bindActionCreators(CommentActionCreators, dispatch);
 
     this.markers = [];
+
+    const mapConfig = JSON.parse(document.getElementById('mapConfig').innerHTML);
+
+    if(mapConfig && mapConfig.markerUrl){
+      this.markerImage = new daum.maps.MarkerImage(
+        mapConfig.markerUrl,
+        new daum.maps.Size(32, 32),
+        {
+          offset: new daum.maps.Point(16, 16)
+        }
+      );
+      this.bigMarkerImage = new daum.maps.MarkerImage(
+        mapConfig.markerUrl,
+        new daum.maps.Size(48, 48),
+        {
+          offset: new daum.maps.Point(24, 24)
+        }
+      );
+    }
   }
 
   componentDidMount() {
@@ -60,6 +78,10 @@ class Spots extends React.Component {
       height: $(window).height() - $('.navbar').height()
     }, () => {
       this.createMap();
+      $('#spot-map').on('click', '.marker-info-window', (e) => {
+        const spotId = $(e.target).data('spotId');
+        this.showSpotDetail(_.find(this.props.spots, (spot) => spot._id === spotId));
+      });
     });
   }
 
@@ -76,6 +98,14 @@ class Spots extends React.Component {
       };
 
       this.map = new daum.maps.Map(container, options);
+      const zoomControl = new daum.maps.ZoomControl();
+      this.map.addControl(zoomControl, daum.maps.ControlPosition.RIGHT);
+      this.clusterer = new daum.maps.MarkerClusterer({
+        map: this.map, // 마커들을 클러스터로 관리하고 표시할 지도 객체
+        averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
+        minLevel: CLUSTERER_LEVEL // 클러스터 할 최소 지도 레벨
+      });
+
       this.markers = [];
 
       this.fetchSpots();
@@ -132,7 +162,7 @@ class Spots extends React.Component {
   removeRenderedMarkers() {
     // 기존에 렌더링 된 마커 삭제
     this.markers.forEach((marker) => {
-      marker.infoWindow.close();
+      marker.infoWindow.setMap(null);
       marker.setMap(null);
     });
     this.markers = [];
@@ -144,23 +174,29 @@ class Spots extends React.Component {
     spots.forEach(spot => {
       if (_.isArray(spot.geo) && spot.geo.length === 2) {
         const markerPosition = new daum.maps.LatLng(spot.geo[0], spot.geo[1]);
-        let marker = new daum.maps.Marker({
+
+        let markerParams = {
           position: markerPosition,
           clickable: true
-        });
+        };
 
+        if(this.markerImage){
+          markerParams.image = this.markerImage;
+        }
+
+        let marker = new daum.maps.Marker(markerParams);
         marker.spotId = spot._id;
-
         marker.setMap(this.map);
 
-        const infoWindow = new daum.maps.InfoWindow({
+        marker.infoWindow = new daum.maps.CustomOverlay({
+          map: this.map,
           position: markerPosition,
-          content: `<div class="marker-info-window">${spot.spotName}</div>`,
-          zIndex: 3
+          content: this.map.getLevel() < CLUSTERER_LEVEL ?
+            `<div class="marker-info-window" data-spot-id="${spot._id}">${spot.spotName}</div>` :
+            '',
+          zIndex: 3,
+          yAnchor: 1.5
         });
-
-        infoWindow.open(this.map, marker);
-        marker.infoWindow = infoWindow;
 
         this.markers.push(marker);
 
@@ -170,6 +206,8 @@ class Spots extends React.Component {
         });
       }
     });
+
+    this.clusterer.addMarkers(this.markers);
   }
 
   showSpotDetail(spot) {
@@ -251,7 +289,6 @@ class Spots extends React.Component {
         defaultHandler();
       }
     });
-
   }
 
   setCurrentPosition() {
@@ -290,10 +327,11 @@ class Spots extends React.Component {
           </Well>
           <div className="map" id="spot-map" />
           <div className="map-control">
-            <SpotList spots={spots}
+            <SimpleSpotList spots={spots}
                       useCurrentPosition={this.state.useCurrentPosition}
-                      onSpotClick={this.handleSpotListClick}
+                      onSpotClick={this.handleSimpleSpotListClick}
                       onMouseOver={this.handleMouseOver}
+                      onMouseOut={this.handleMouseOut}
                       onCurrentPositionClick={this.handleCurrentPositionClick}/>
           </div>
         </div>
@@ -322,7 +360,7 @@ class Spots extends React.Component {
     this.handleModalClose();
   };
 
-  handleSpotListClick = (spot, e) => {
+  handleSimpleSpotListClick = (spot, e) => {
     e.preventDefault();
     this.map.setCenter(new daum.maps.LatLng(spot.geo[0], spot.geo[1]));
     this.showSpotDetail(spot);
@@ -338,10 +376,19 @@ class Spots extends React.Component {
   };
 
   handleMouseOver = (spotId) => {
-    // 현재 마커중 찾아서 표시하기
-
-    console.log(spotId);
+    if(this.markerImage){
+      // 현재 마커중 찾아서 표시하기
+      const marker = _.find(this.markers, (marker) => marker.spotId === spotId);
+      marker.setImage(this.bigMarkerImage);
+    }
   };
+
+  handleMouseOut = (spotId) => {
+    if(this.markerImage) {
+      const marker = _.find(this.markers, (marker) => marker.spotId === spotId);
+      marker.setImage(this.markerImage);
+    }
+  }
 }
 
 
@@ -352,4 +399,4 @@ export default connect((state) => {
     nowLoading: state.spots.nowLoading,
     comments: state.comments
   };
-})(Spots);
+})(SpotMapContainer);

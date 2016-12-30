@@ -9,7 +9,9 @@
 ```javascript
 module.exports = {
   mongo: 'mongodb://localhost/spots',
-  daumMapApiKey: '',
+  map: {
+    apiKey: ''
+  },
   title: 'Board Spot Share',
   auth: {
     facebook: {

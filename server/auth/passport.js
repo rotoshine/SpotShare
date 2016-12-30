@@ -3,6 +3,8 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const KakaoStrategy = require('passport-kakao').Strategy;
 const TwitterStrategy = require('passport-twitter').Strategy;
 
+const FB = require('fb');
+
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
@@ -41,13 +43,24 @@ function oauthConnect(provider, profile, done) {
 const Providers = {
   facebook: {
     strategy: FacebookStrategy,
-    scope: ['public_profile', 'user_about_me', 'user_location']
+    scope: ['public_profile', 'user_about_me', 'user_location'],
+    saveProfileImage: (accessToken, profile) => {
+      return new Promise((resolve) => {
+
+      });
+    }
   },
   kakao: {
-    strategy: KakaoStrategy
+    strategy: KakaoStrategy,
+    saveProfileImage: (accessToken, profile) => {
+
+    }
   },
   twitter: {
-    strategy: TwitterStrategy
+    strategy: TwitterStrategy,
+    saveProfileImage: (accessToken, profile) => {
+
+    }
   }
 };
 

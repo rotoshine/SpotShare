@@ -71,7 +71,15 @@ export default class SpotDetailModal extends React.Component {
               <span>님이 공유한 장소입니다.</span>
             </div>
           </div>
-          <div style={{width:'100%', height: 300}} id="road-view">
+          <div className="row">
+            <div className="col-xs-12">
+              <button className="btn btn-default btn-raised pull-left" onClick={() => { alert('구현예정'); }}><i className="fa fa-edit"/> Modify</button>
+              <button className="btn btn-info btn-raised pull-right" onClick={() => { alert('구현예정'); }}><i className="fa fa-share-alt"/> Share</button>
+            </div>
+          </div>
+          <div className="row">
+            <div style={{width:'100%', height: 300}} id="road-view">
+          </div>
           </div>
           <CommentBox spotId={spot._id}
                       isLogin={isLogin}
