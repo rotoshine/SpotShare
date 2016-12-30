@@ -165,6 +165,7 @@ class SpotMapContainer extends React.Component {
       marker.infoWindow.setMap(null);
       marker.setMap(null);
     });
+    this.clusterer.removeMarkers(this.markers);
     this.markers = [];
   }
   renderMarkers() {
