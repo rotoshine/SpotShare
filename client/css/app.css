@@ -92,3 +92,12 @@ html, body, .root {
   text-align:center;
   padding: 3px;
 }
+
+.fa-kakao {
+  width:20px;
+  height: 16px;
+  background-image: url('/images/icons/kakao-icon.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}

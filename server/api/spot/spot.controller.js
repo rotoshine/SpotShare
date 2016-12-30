@@ -20,7 +20,7 @@ exports.findAll = (req, res) => {
       }
     }
   })
-  .populate('createdBy', 'name')
+  .populate('createdBy', 'name provider')
   .exec((err, spots) => {
     if (err) {
       return res.status(500).json({

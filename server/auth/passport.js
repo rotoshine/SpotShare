@@ -1,6 +1,8 @@
 'use strict';
 const FacebookStrategy = require('passport-facebook').Strategy;
 const KakaoStrategy = require('passport-kakao').Strategy;
+const TwitterStrategy = require('passport-twitter').Strategy;
+
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
@@ -36,9 +38,17 @@ function oauthConnect(provider, profile, done) {
   });
 }
 
-const Provider = {
-  FACEBOOK: 'facebook',
-  KAKAO: 'kakao'
+const Providers = {
+  facebook: {
+    strategy: FacebookStrategy,
+    scope: ['public_profile', 'user_about_me', 'user_location']
+  },
+  kakao: {
+    strategy: KakaoStrategy
+  },
+  twitter: {
+    strategy: TwitterStrategy
+  }
 };
 
 module.exports = (app, passport, config) => {
@@ -52,43 +62,31 @@ module.exports = (app, passport, config) => {
     });
   });
 
-  // facebook setting
-  passport.use(new FacebookStrategy({
-    clientID: config.auth.facebook.appId,
-    clientSecret: config.auth.facebook.appSecret,
-    callbackURL: config.auth.facebook.callbackURL
-  }, (accessToken, refreshToken, profile, done) => {
-    return oauthConnect(Provider.FACEBOOK, profile, done);
-  }));
+  for(let providerName in config.auth){
+      const authConfig = config.auth[providerName];
+      const provider = Providers[providerName];
 
-  app.get('/auth/facebook/login', passport.authenticate('facebook', {
-    session: true,
-    scope: ['public_profile', 'user_about_me', 'user_location']
-  }));
-  app.get('/auth/facebook/login/callback', passport.authenticate('facebook', {
-    session: true,
-    successRedirect: '/'
-  }));
+      if(provider){
+        passport.use(new provider.strategy(authConfig, (accessToken, refreshToken, profile, done) => {
+          return oauthConnect(providerName, profile, done);
+        }));
 
-  // kakao setting
-  if(config.auth.kakao){
-    passport.use(new KakaoStrategy({
-        clientID: config.auth.kakao.clientID,
-        callbackURL: config.auth.kakao.callbackURL
-      },
-      (accessToken, refreshToken, profile, done) => {
-        return oauthConnect(Provider.KAKAO, profile, done);
+
+        let passportParams = {
+          session: true
+        };
+
+        if(provider.scope){
+          passportParams.scope = provider.scope;
+        }
+        app.get(`/auth/${providerName}/login`, passport.authenticate(providerName, passportParams));
+        app.get(`/auth/${providerName}/login/callback`, passport.authenticate(providerName, {
+          session: true,
+          successRedirect: '/'
+        }));
+
+        console.log(`[AUTH] ${providerName} enable.`);
       }
-    ));
-
-    app.get('/auth/kakao/login', passport.authenticate('kakao', {
-      session: true
-    }));
-
-    app.get('/auth/kakao/login/callback', passport.authenticate('kakao', {
-      session: true,
-      successRedirect: '/'
-    }));
   }
 
   app.get('/api/me', passport.authenticate('facebook', {session: true}), (req, res) => {

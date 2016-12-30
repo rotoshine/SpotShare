@@ -24,12 +24,18 @@ export default class App extends React.Component {
     let userComponent = null;
     let authButtons = [
       (
-        <NavItem eventKey={1} key={1} href="/auth/facebook/login" className="btn-raised">
+        <NavItem eventKey={1} key={1} href="/auth/facebook/login" className="btn-raised" style={{backgroundColor: '#3b5998'}}>
           <i className="fa fa-facebook"/> Login
-        </NavItem>),
+        </NavItem>
+      ),
       (
-        <NavItem eventKey={2} key={2} href="/auth/kakao/login" className="btn-raised">
-          Kakao Login
+        <NavItem eventKey={2} key={2} href="/auth/twitter/login" className="btn-raised" style={{backgroundColor:'#1DA1F2'}}>
+          <i className="fa fa-twitter" /> Login
+        </NavItem>
+      ),
+      (
+        <NavItem eventKey={3} key={3} href="/auth/kakao/login" className="btn-raised" style={{backgroundColor:'#FFEA0A', color: '#000000'}}>
+          <i className="fa fa-kakao" /> Login
         </NavItem>
       )
     ];
