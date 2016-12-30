@@ -419,10 +419,7 @@ class SpotMapContainer extends React.Component {
 }
 
 
-export
-default
-
-connect(
+export default connect(
   (state) => {
     return {
       spots: state.spots.spots,
