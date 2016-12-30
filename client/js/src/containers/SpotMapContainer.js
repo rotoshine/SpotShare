@@ -21,6 +21,7 @@ class SpotMapContainer extends React.Component {
     nowLoading: PropTypes.bool.isRequired,
     spots: PropTypes.array.isRequired,
     spotForm: PropTypes.shape({
+      _id: PropTypes.number,
       spotName: PropTypes.string,
       description: PropTypes.string,
       address: PropTypes.string,
@@ -31,7 +32,7 @@ class SpotMapContainer extends React.Component {
 
   state = {
     nowLoading: false,
-    addModal: {
+    formModal: {
       visible: false
     },
     detailDisplayModal: {
@@ -55,7 +56,7 @@ class SpotMapContainer extends React.Component {
 
     const mapConfig = JSON.parse(document.getElementById('mapConfig').innerHTML);
 
-    if(mapConfig && mapConfig.markerUrl){
+    if (mapConfig && mapConfig.markerUrl) {
       this.markerImage = new daum.maps.MarkerImage(
         mapConfig.markerUrl,
         new daum.maps.Size(32, 32),
@@ -124,24 +125,28 @@ class SpotMapContainer extends React.Component {
         this.fetchSpots();
       });
       event.addListener(map, 'dblclick', (mouseEvent) => {
-        if(this.state.user.isLogin){
-          this.showSpotFormModal(mouseEvent.latLng);
-        }else{
+        if (this.state.user.isLogin) {
+          this.showNewSpotFormModal(mouseEvent.latLng);
+        } else {
           alert('로그인 후 등록 가능합니다.');
         }
       });
     }
   }
 
-  createSpot() {
-    this.actions.createSpot(this.props.spotForm).then(() => {
+  createOrUpdateSpot() {
+    const {spotForm} = this.props;
+    const createOrUpdateAfterCallback = () => {
+      this.actions.resetSpotForm();
       this.fetchSpots();
-    });
-    this.actions.resetSpotForm();
-
-    this.renderMarkers();
-    this.handleModalClose();
-
+      this.renderMarkers();
+      this.handleModalClose();
+    };
+    if (spotForm._id) {
+      this.actions.modifySpot(spotForm).then(createOrUpdateAfterCallback);
+    }else{
+      this.actions.createSpot(this.props.spotForm).then(createOrUpdateAfterCallback);
+    }
   }
 
   fetchSpots() {
@@ -168,6 +173,7 @@ class SpotMapContainer extends React.Component {
     this.clusterer.removeMarkers(this.markers);
     this.markers = [];
   }
+
   renderMarkers() {
     this.removeRenderedMarkers();
     const {spots} = this.props;
@@ -181,7 +187,7 @@ class SpotMapContainer extends React.Component {
           clickable: true
         };
 
-        if(this.markerImage){
+        if (this.markerImage) {
           markerParams.image = this.markerImage;
         }
 
@@ -224,7 +230,7 @@ class SpotMapContainer extends React.Component {
     });
   }
 
-  showSpotFormModal(latLng) {
+  showNewSpotFormModal(latLng) {
     // getting pressed position
     const geocoder = new daum.maps.services.Geocoder();
 
@@ -242,12 +248,21 @@ class SpotMapContainer extends React.Component {
         this.actions.updateSpotForm('geo', [latLng.getLat(), latLng.getLng()]);
         this.actions.updateSpotForm('address', address);
         this.setState({
-          addModal: {
+          formModal: {
             visible: true
           }
         }, () => {
           $('#spotName').focus();
         });
+      }
+    });
+  }
+
+  showModifySpotFormModal(spot) {
+    this.actions.setSpotForm(spot);
+    this.setState({
+      formModal: {
+        visible: true
       }
     });
   }
@@ -300,7 +315,7 @@ class SpotMapContainer extends React.Component {
   }
 
   render() {
-    const {addModal, detailDisplayModal, user} = this.state;
+    const {formModal, detailDisplayModal, user} = this.state;
     const {spots, spotForm} = this.props;
 
     const {createComment, removeComment} = this.commentActions;
@@ -315,8 +330,9 @@ class SpotMapContainer extends React.Component {
                          onAddComment={createComment}
                          onRemoveComment={removeComment}
                          onLike={this.handleSpotLike}
-                         onClose={this.handleModalClose}/>
-        <SpotFormModal visible={addModal.visible}
+                         onClose={this.handleModalClose}
+                         onModifyClick={this.handleSpotModifyClick}/>
+        <SpotFormModal visible={formModal.visible}
                        spotForm={spotForm}
                        onFormUpdate={this.actions.updateSpotForm}
                        onClose={this.handleModalClose}
@@ -326,14 +342,14 @@ class SpotMapContainer extends React.Component {
             '스팟을 등록하려면 해당 위치를 더블클릭 하세요' :
             '스팟을 등록하려면 로그인 하세요.'}.
           </Well>
-          <div className="map" id="spot-map" />
+          <div className="map" id="spot-map"/>
           <div className="map-control">
             <SimpleSpotList spots={spots}
-                      useCurrentPosition={this.state.useCurrentPosition}
-                      onSpotClick={this.handleSimpleSpotListClick}
-                      onMouseOver={this.handleMouseOver}
-                      onMouseOut={this.handleMouseOut}
-                      onCurrentPositionClick={this.handleCurrentPositionClick}/>
+                            useCurrentPosition={this.state.useCurrentPosition}
+                            onSpotClick={this.handleSimpleSpotListClick}
+                            onMouseOver={this.handleMouseOver}
+                            onMouseOut={this.handleMouseOut}
+                            onCurrentPositionClick={this.handleCurrentPositionClick}/>
           </div>
         </div>
       </App>
@@ -341,8 +357,9 @@ class SpotMapContainer extends React.Component {
   }
 
   handleModalClose = () => {
+    this.actions.resetSpotForm();
     this.setState({
-      addModal: {
+      formModal: {
         visible: false,
         eventX: null,
         eventY: null
@@ -357,7 +374,7 @@ class SpotMapContainer extends React.Component {
 
   handleSpotFormSubmit = (e) => {
     e.preventDefault();
-    this.createSpot();
+    this.createOrUpdateSpot();
     this.handleModalClose();
   };
 
@@ -377,7 +394,7 @@ class SpotMapContainer extends React.Component {
   };
 
   handleMouseOver = (spotId) => {
-    if(this.markerImage){
+    if (this.markerImage) {
       // 현재 마커중 찾아서 표시하기
       const marker = _.find(this.markers, (marker) => marker.spotId === spotId);
       marker.setImage(this.bigMarkerImage);
@@ -385,19 +402,33 @@ class SpotMapContainer extends React.Component {
   };
 
   handleMouseOut = (spotId) => {
-    if(this.markerImage) {
+    if (this.markerImage) {
       const marker = _.find(this.markers, (marker) => marker.spotId === spotId);
       marker.setImage(this.markerImage);
     }
-  }
+  };
+
+  handleSpotModifyClick = (spot) => {
+    if(this.state.user.isLogin){
+      this.handleModalClose();
+      this.showModifySpotFormModal(spot);
+    }else{
+      alert('로그인 후 수정 가능합니다.');
+    }
+  };
 }
 
 
-export default connect((state) => {
-  return {
-    spots: state.spots.spots,
-    spotForm: state.spots.spotForm,
-    nowLoading: state.spots.nowLoading,
-    comments: state.comments
-  };
-})(SpotMapContainer);
+export
+default
+
+connect(
+  (state) => {
+    return {
+      spots: state.spots.spots,
+      spotForm: state.spots.spotForm,
+      nowLoading: state.spots.nowLoading,
+      comments: state.comments
+    };
+  })
+(SpotMapContainer);

@@ -8,12 +8,12 @@ import {
   RESET_SPOT_FORM
 } from '../actions/spotsActions';
 import _ from 'lodash';
-import Immutable from 'immutable';
 
 const initialSpotsState = {
   nowLoading: false,
   spots: [],
   spotForm: {
+    _id: null,
     spotName: '',
     description: '',
     address: '',
@@ -35,12 +35,15 @@ function spots(state = initialSpotsState, action) {
         spots: action.spots
       });
     case CREATE_SPOT:
+      let nextSpots = _.cloneDeep(state.spots);
+      nextSpots.push(action.spot);
       return _.assign({}, state, {
-        spots: state.spots.push(action.spot)
+        spots: _.concat(state.spots, action.spot)
       });
     case SET_SPOT_FORM:
       return _.assign({}, state, {
         spotForm: {
+          _id: action.spotForm._id,
           spotName: action.spotForm.spotName,
           description: action.spotForm.description,
           address: action.spotForm.address,
@@ -57,6 +60,7 @@ function spots(state = initialSpotsState, action) {
     case RESET_SPOT_FORM:
       return _.assign({}, state, {
         spotForm: {
+          _id: null,
           spotName: '',
           description: '',
           address: '',

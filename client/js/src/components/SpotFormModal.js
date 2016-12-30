@@ -61,8 +61,8 @@ export default class SpotFormModal extends React.Component {
             </FormGroup>
 
             <FormGroup>
-              <Button bsStyle="primary" type="submit" style={{width:'100%'}}>
-                등록하기
+              <Button bsStyle="primary" type="submit" style={{width:'100%'}} className="btn-raised">
+                <i className="fa fa-save"/> {spotForm._id ? '수정' : '등록'}
               </Button>
             </FormGroup>
           </Form>

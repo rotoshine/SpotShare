@@ -35,14 +35,24 @@ export function createSpot(newSpot) {
   };
 }
 
-export function likeSpot(spotId){
+export function modifySpot(spot) {
+  return (dispatch) => {
+    dispatch({
+      type: Actions.MODIFY_SPOT,
+      spot: spot
+    });
+    return axios.put(`/api/spots/${spot._id}`, spot);
+  }
+}
+
+export function likeSpot(spotId) {
   return {
     type: Actions.LIKE_SPOT,
     spotId: spotId
   };
 }
 
-export function setSpotForm(spotForm){
+export function setSpotForm(spotForm) {
   return {
     type: Actions.SET_SPOT_FORM,
     spotForm: spotForm
@@ -57,7 +67,7 @@ export function updateSpotForm(field, value) {
   };
 }
 
-export function resetSpotForm(){
+export function resetSpotForm() {
   return {
     type: Actions.RESET_SPOT_FORM
   };

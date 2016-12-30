@@ -19,7 +19,23 @@ export default class SimpleSpotList extends React.Component {
     let spotListComponents = [];
 
     if (_.isArray(spots)) {
-      spots.forEach((spot, i) => {
+      if (spots.length === 0) {
+        spotListComponents.push(
+          <li key="empty">이 지역엔 공유된 장소가 없습니다.</li>
+        );
+      }else{
+        spotListComponents.push(
+          <li key="summary"><div className="well well-sm">총 {spots.length} 개의 Spot</div></li>
+        );
+      }
+
+      let spotsPartial = spots;
+      let hasMoreSpots = false;
+      if(spots.length > 10){
+        hasMoreSpots = true;
+        spotsPartial = spots.slice(0, 10);
+      }
+      spotsPartial.forEach((spot, i) => {
         spotListComponents.push(
           <li key={i}>
             <a href="#" onClick={onSpotClick.bind(this, spot)}
@@ -41,10 +57,10 @@ export default class SimpleSpotList extends React.Component {
         );
       });
 
-      if (spotListComponents.length === 0) {
+      if(hasMoreSpots){
         spotListComponents.push(
-          <li key="empty">이 지역엔 공유된 장소가 없습니다.</li>
-        )
+          <li key="and-more">...and more...</li>
+        );
       }
     }
 

@@ -6,6 +6,7 @@ const glob = require('glob');
 const _ = require('lodash');
 const express = require('express');
 const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 const autoIncrement = require('mongoose-auto-increment');
 const path = require('path');
 const exphbs = require('express-handlebars');
@@ -69,7 +70,7 @@ if(_.isArray(modelPaths)){
       autoIncrement: autoIncrement
     });
 
-    console.log(`${modelPaths} model loaded.`);
+    console.log(`${modelPath} model loaded.`);
   });
   console.log('model loading done.');
 }

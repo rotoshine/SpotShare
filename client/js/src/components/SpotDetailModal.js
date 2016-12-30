@@ -13,6 +13,7 @@ export default class SpotDetailModal extends React.Component {
     onAddComment: PropTypes.func.isRequired,
     onRemoveComment: PropTypes.func.isRequired,
     onLike: PropTypes.func.isRequired,
+    onModifyClick: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired
   };
   
@@ -33,7 +34,8 @@ export default class SpotDetailModal extends React.Component {
   }
   
   render() {
-    const {spot, visible, isLogin, comments, onClose, onAddComment, onRemoveComment} = this.props;
+    const {spot, visible, isLogin, comments,
+      onClose, onAddComment, onRemoveComment, onModifyClick} = this.props;
 
     if (spot === null) {
       return null;
@@ -73,7 +75,7 @@ export default class SpotDetailModal extends React.Component {
           </div>
           <div className="row">
             <div className="col-xs-12">
-              <button className="btn btn-default btn-raised pull-left" onClick={() => { alert('구현예정'); }}><i className="fa fa-edit"/> Modify</button>
+              <button className="btn btn-default btn-raised pull-left" onClick={onModifyClick.bind(this, spot)}><i className="fa fa-edit"/> Modify</button>
               <button className="btn btn-info btn-raised pull-right" onClick={() => { alert('구현예정'); }}><i className="fa fa-share-alt"/> Share</button>
             </div>
           </div>
