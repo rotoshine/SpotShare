@@ -11,6 +11,7 @@ export default class App extends React.Component {
 
   state = {
     user: JSON.parse(document.getElementById('user').innerHTML),
+    providers: JSON.parse(document.getElementById('providers').innerHTML),
     title: $('title').html()
   };
 
@@ -18,41 +19,41 @@ export default class App extends React.Component {
     window.$.material.init();
   }
 
-  render() {
+  renderLoginProviders() {
     const {user} = this.state;
-
-    let userComponent = null;
-    let authButtons = [
-      (
-        <NavItem eventKey={1} key={1} href="/auth/facebook/login" className="btn-raised" style={{backgroundColor: '#3b5998'}}>
-          <i className="fa fa-facebook"/> Login
-        </NavItem>
-      ),
-      (
-        <NavItem eventKey={2} key={2} href="/auth/twitter/login" className="btn-raised" style={{backgroundColor:'#1DA1F2'}}>
-          <i className="fa fa-twitter" /> Login
-        </NavItem>
-      ),
-      (
-        <NavItem eventKey={3} key={3} href="/auth/kakao/login" className="btn-raised" style={{backgroundColor:'#FFEA0A', color: '#000000'}}>
-          <i className="fa fa-kakao" /> Login
-        </NavItem>
-      )
-    ];
-
-    if (user.isLogin) {
-      userComponent = (
-        <NavItem>
-          <span className="label label-info">Hello {user.name}!</span>
-        </NavItem>
-      );
-      authButtons = [(
+    if(user.isLogin){
+      return (
         <li eventKey={1} key={1}>
           <div className="bs-components" style={{marginTop:10}}>
             <a href="/logout" className="btn btn-raised btn-xs btn-danger">Logout</a>
           </div>
         </li>
-      )];
+      );
+    }else{
+      let authButtons = [];
+      this.state.providers.forEach((provider, i) => {
+        authButtons.push(
+          <NavItem eventKey={i} key={i} href={`/auth/${provider}/login`} className={`btn-raised auth-button-${provider}`}>
+            <i className={`fa fa-${provider}`} /> Login
+          </NavItem>
+        );
+      });
+
+      return authButtons;
+    }
+
+  }
+  render() {
+    const {user} = this.state;
+
+    let userComponent = null;
+
+    if (user.isLogin) {
+      userComponent = (
+        <NavItem>
+          <span className="label label-info">Hello <i className={`fa fa-${user.provider}`} />{user.name}!</span>
+        </NavItem>
+      );
     }
 
     return (
@@ -70,7 +71,7 @@ export default class App extends React.Component {
             </Nav>
             <Nav pullRight>
               {userComponent}
-              {authButtons}
+              {this.renderLoginProviders()}
             </Nav>
           </Navbar.Collapse>
         </Navbar>

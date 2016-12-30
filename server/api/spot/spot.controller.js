@@ -70,11 +70,11 @@ exports.update = (req, res) => {
   return Spot
     .findById(spotId)
     .then((spot) => {
-      const hasUpdate = spot.spotName !== body.spotName || spot.spotDetail !== body.spotDetail;
+      const hasUpdate = spot.spotName !== body.spotName || spot.description !== body.description;
       if (spot !== null && hasUpdate) {
         const originSpotJSON = JSON.stringify(spot);
         spot.spotName = body.spotName;
-        spot.spotDetail = body.spotDetail;
+        spot.description = body.description;
         spot.updatedAt = new Date();
         spot.updatedBy = req.user._id;
         const updateSpotJSON = JSON.stringify(spot);
@@ -98,6 +98,10 @@ exports.update = (req, res) => {
               .catch(loggingError);
           })
           .catch(loggingError);
+      }else{
+        return res.status(200).json({
+          result: 'not update.'
+        });
       }
     });
 };

@@ -118,7 +118,8 @@ app.get('', (req, res) => {
     mapApiKey: config.map.apiKey,
     gaKey: config.googleAnalyticsKey || '',
     map: JSON.stringify(config.map),
-    user: JSON.stringify(user)
+    user: JSON.stringify(user),
+    providers: JSON.stringify(_.keys(config.auth))
   });
 });
 

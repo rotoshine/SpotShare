@@ -11,7 +11,7 @@ exports.findBySpotId = (req, res) => {
     .find({
       spot: spotId
     })
-    .populate('createdBy', 'name')
+    .populate('createdBy', 'name provider')
     .sort({
       createdAt: -1
     })

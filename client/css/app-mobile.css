@@ -30,9 +30,18 @@
     font-size: 1em;
   }
 
-
   .map-tooltip {
     right: 10px;
     top: 10px;
+  }
+
+  /* spot detail modal */
+  .spot-detail-contents-container{
+    flex-direction: row;
+  }
+
+  .spot-detail-contents-container .road-view{
+    width: 100%;
+    height: 300px;
   }
 }

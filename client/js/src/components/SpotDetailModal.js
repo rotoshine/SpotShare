@@ -1,7 +1,8 @@
 import React, {PropTypes} from 'react';
 import _ from 'lodash';
+import nl2br from 'react-nl2br';
 
-import {Modal} from 'react-bootstrap';
+import {Modal, ButtonGroup} from 'react-bootstrap';
 import CommentBox from './comments/CommentBox';
 
 export default class SpotDetailModal extends React.Component {
@@ -53,36 +54,37 @@ export default class SpotDetailModal extends React.Component {
       createdBy = { name: '신원미상' };
     }
     return (
-      <Modal show={visible} onHide={onClose}>
+      <Modal bsSize="large" show={visible} onHide={onClose}>
         <Modal.Header closeButton>
-          <Modal.Title>{spot.spotName} 상세정보</Modal.Title>
+          <Modal.Title>{spot.spotName}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <dl className="dl-horizontal">
-            <dt>이름</dt>
-            <dd>{spot.spotName}</dd>
-            <dt>주소</dt>
-            <dd>{spot.address}</dd>
-            <dt>설명</dt>
-            <dd>{description}</dd>
-          </dl>
-          <hr/>
-          <div className="row" style={{marginTop:-10, marginBottom:10}}>
-            <div className="col-xs-offset-2">
-              <span className="label label-primary"><i className={`fa fa-${createdBy.provider}`} />{createdBy.name}</span>
-              <span>님이 공유한 장소입니다.</span>
+          <div className="row">
+            <div className="spot-detail-contents-container">
+              <div className="spot-detail-modal-contents">
+                <div><strong>{spot.address}</strong>에 위치</div>
+                <div className="spot-detail-description">{nl2br(description)}</div>
+              </div>
+              <div id="road-view" className="road-view" />
             </div>
           </div>
+          <hr/>
           <div className="row">
             <div className="col-xs-12">
-              <button className="btn btn-default btn-raised pull-left" onClick={onModifyClick.bind(this, spot)}><i className="fa fa-edit"/> Modify</button>
-              <button className="btn btn-info btn-raised pull-right" onClick={() => { alert('구현예정'); }}><i className="fa fa-share-alt"/> Share</button>
+              <div className="pull-left">
+                <button className="btn btn-primary btn-raised"><i className="fa fa-thumbs-up "/> {spot.likeCount}명이 추천합니다.</button>
+              </div>
+              <div className="pull-right">
+                <span className="label label-info"><i className={`fa fa-${createdBy.provider}`}/> {createdBy.name}</span>
+                <span>님이 공유</span>
+                <ButtonGroup>
+                  <button className="btn btn-default btn-raised" onClick={onModifyClick.bind(this, spot)}><i className="fa fa-edit"/> Modify</button>
+                  <button className="btn btn-info btn-raised " onClick={() => { alert('구현예정'); }}><i className="fa fa-share-alt"/> Share</button>
+                </ButtonGroup>
+              </div>
             </div>
           </div>
-          <div className="row">
-            <div style={{width:'100%', height: 300}} id="road-view">
-          </div>
-          </div>
+          <hr/>
           <CommentBox spotId={spot._id}
                       isLogin={isLogin}
                       comments={comments}

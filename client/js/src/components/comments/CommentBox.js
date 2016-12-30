@@ -20,6 +20,23 @@ export default class CommentBox extends React.Component {
     onAddComment(spotId, commentText);
   }
 
+  renderComments() {
+    const {comments} = this.props;
+    let commentsComponent = [];
+    if (_.isArray(comments) && comments.length > 0) {
+      comments.forEach((comment, i) => {
+        commentsComponent.push(
+          <Comment key={i} comment={comment} />
+        );
+      });
+    } else {
+      commentsComponent.push(
+        <div key="empty" className="text-center">아직 이 장소에 대한 댓글이 없습니다.</div>
+      );
+    }
+
+    return commentsComponent;
+  }
   render() {
     const {comments, isLogin} = this.props;
     let commentsComponent = [];
@@ -48,9 +65,7 @@ export default class CommentBox extends React.Component {
           <div className="col-xs-1">
             <div className="pull-right btn-group-sm">
               <button type="submit" className="btn btn-primary btn-fab">
-                <i className="material-icons">
-                  comment
-                </i>
+                <i className="fa fa-2x fa-comment" style={{marginLeft:-12}}/>
               </button>
             </div>
           </div>
@@ -65,7 +80,7 @@ export default class CommentBox extends React.Component {
         </div>
         <div className="col-xs-12">
           <div style={{paddingLeft: 20}}>
-            {commentsComponent}
+            {this.renderComments()}
           </div>
         </div>
       </div>
@@ -82,9 +97,5 @@ export default class CommentBox extends React.Component {
       this.createComment(value);
       $comment.val('');
     }
-  };
-
-  handleLike = (e) => {
-    e.preventDefault();
   };
 }

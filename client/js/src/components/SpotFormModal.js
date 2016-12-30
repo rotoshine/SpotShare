@@ -41,6 +41,7 @@ export default class SpotFormModal extends React.Component {
               </Col>
               <Col xs={9} sm={10}>
                 <FormControl componentClass="textarea"
+                             rows="10"
                              value={spotForm.description}
                              onChange={(e) => {
                                 onFormUpdate('description', e.target.value);

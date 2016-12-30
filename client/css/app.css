@@ -112,3 +112,32 @@ html, body, .root {
   background-size: cover;
   background-position: center;
 }
+
+.auth-button-facebook{
+  background-color: #3b5998
+}
+
+.auth-button-twitter{
+  background-color: #1DA1F2
+}
+
+.auth-button-kakao {
+  background-color: #FFEA0A;
+  color: #FFFFFF;
+}
+
+/* spot detail modal */
+.spot-detail-contents-container{
+  display: flex;
+  flex-direction:row;
+}
+
+.spot-detail-contents-container .road-view{
+  width: 50%;
+  height: 300px;
+}
+
+.spot-detail-contents-container .spot-detail-modal-contents{
+  padding-left:10px;
+  width: 50%;
+}

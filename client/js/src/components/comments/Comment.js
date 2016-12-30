@@ -18,7 +18,7 @@ export default class Comment extends React.Component {
       <div className="row">
         <div className="col-xs-3">
           <span className="label label-info">
-            {comment.createdBy.name}
+            <i className={`fa fa-${comment.createdBy.provider}`}/> {comment.createdBy.name}
           </span>
         </div>
         <div className="col-xs-6">
