@@ -6,6 +6,7 @@ module.exports = {
   },
   title: '각종 스팟 공유',
   sessionSecret: '',
+  googleAnalyticsKey: '',
   auth: {
     facebook: {
       clientID: '',

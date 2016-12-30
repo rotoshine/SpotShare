@@ -115,6 +115,7 @@ app.get('', (req, res) => {
     fireBaseAuthDomain: config.fireBaseAuthDomain,
     fireBaseDatabaseURL: config.fireBaseDatabaseURL,
     mapApiKey: config.map.apiKey,
+    gaKey: config.googleAnalyticsKey || '',
     map: JSON.stringify(config.map),
     user: JSON.stringify(user)
   });
