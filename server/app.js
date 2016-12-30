@@ -112,11 +112,9 @@ app.get('', (req, res) => {
 
   return res.render('index', {
     title: config.title,
-    fireBaseApiKey: config.fireBaseApiKey,
-    fireBaseAuthDomain: config.fireBaseAuthDomain,
-    fireBaseDatabaseURL: config.fireBaseDatabaseURL,
+    fireBase: config.fireBase,
     mapApiKey: config.map.apiKey,
-    gaKey: config.googleAnalyticsKey || '',
+    googleAnalyticsKey: config.googleAnalyticsKey || '',
     map: JSON.stringify(config.map),
     user: JSON.stringify(user),
     providers: JSON.stringify(_.keys(config.auth))
