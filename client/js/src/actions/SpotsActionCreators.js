@@ -45,6 +45,27 @@ export function modifySpot(spot) {
   }
 }
 
+export function removeSpot(spotId) {
+  return (dispatch) => {
+    dispatch({
+      type: Actions.REMOVE_SPOT,
+      spotId: spotId
+    });
+
+    return axios.delete(`/api/spots/${spotId}`);
+  }
+}
+
+export function removeRequestSpot(spotId) {
+  return (dispatch) => {
+    dispatch({
+      type: Actions.REMOVE_REQUEST_SPOT,
+      spotId: spotId
+    });
+
+    return axios.post(`/api/spots/${spotId}/remove-request`);
+  }
+}
 export function likeSpot(spotId) {
   return {
     type: Actions.LIKE_SPOT,

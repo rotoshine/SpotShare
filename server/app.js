@@ -104,6 +104,7 @@ app.get('', (req, res) => {
   };
   if(req.user){
     user = {
+      _id: req.user._id,
       isLogin: true,
       name: req.user.name,
       provider: req.user.provider

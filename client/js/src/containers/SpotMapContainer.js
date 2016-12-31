@@ -139,7 +139,6 @@ class SpotMapContainer extends React.Component {
     const createOrUpdateAfterCallback = () => {
       this.actions.resetSpotForm();
       this.fetchSpots();
-      this.renderMarkers();
       this.handleModalClose();
     };
     if (spotForm._id) {
@@ -327,6 +326,7 @@ class SpotMapContainer extends React.Component {
                          spot={detailDisplayModal.displaySpot}
                          isLogin={user.isLogin}
                          comments={this.props.comments}
+                         onRemove={this.handleSpotRemoveClick}
                          onAddComment={createComment}
                          onRemoveComment={removeComment}
                          onLike={this.handleSpotLike}
@@ -414,6 +414,28 @@ class SpotMapContainer extends React.Component {
       this.showModifySpotFormModal(spot);
     }else{
       alert('로그인 후 수정 가능합니다.');
+    }
+  };
+
+  handleSpotRemoveClick = (spot) => {
+    const {user} = this.state;
+
+    const removeAfterCallback = () => {
+      this.handleModalClose();
+      this.fetchSpots();
+    };
+    if(user.isLogin){
+      if(user._id === spot.createdBy._id){
+        if(confirm('공유하신 스팟을 삭제하시겠습니까?')){
+          this.actions.removeSpot(spot._id).then(removeAfterCallback);
+        }
+      }else{
+        if(confirm('등록한 사용자가 아니기 때문에 삭제요청만 가능합니다.\n삭제요청하시겠습니까?')){
+          this.actions.removeRequestSpot(spot._id).then(removeAfterCallback);
+        }
+      }
+    }else{
+      alert('로그인 하세요.');
     }
   };
 }

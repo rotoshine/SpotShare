@@ -11,6 +11,7 @@ export default class SpotDetailModal extends React.Component {
     spot: PropTypes.object,
     isLogin: PropTypes.bool.isRequired,
     comments: PropTypes.array,
+    onRemove: PropTypes.func.isRequired,
     onAddComment: PropTypes.func.isRequired,
     onRemoveComment: PropTypes.func.isRequired,
     onLike: PropTypes.func.isRequired,
@@ -36,7 +37,7 @@ export default class SpotDetailModal extends React.Component {
   
   render() {
     const {spot, visible, isLogin, comments,
-      onClose, onAddComment, onRemoveComment, onModifyClick} = this.props;
+      onRemove, onClose, onAddComment, onRemoveComment, onModifyClick} = this.props;
 
     if (spot === null) {
       return null;
@@ -72,14 +73,15 @@ export default class SpotDetailModal extends React.Component {
           <div className="row">
             <div className="col-xs-12">
               <div className="pull-left">
-                <button className="btn btn-primary btn-raised"><i className="fa fa-thumbs-up "/> {spot.likeCount}명이 추천합니다.</button>
+                <button className="btn btn-primary btn-raised"><i className="fa fa-thumbs-up "/> {spot.likeCount}</button>명이 추천합니다.
               </div>
               <div className="pull-right">
                 <span className="label label-info"><i className={`fa fa-${createdBy.provider}`}/> {createdBy.name}</span>
                 <span>님이 공유</span>
                 <ButtonGroup>
-                  <button className="btn btn-default btn-raised" onClick={onModifyClick.bind(this, spot)}><i className="fa fa-edit"/> Modify</button>
-                  <button className="btn btn-info btn-raised " onClick={() => { alert('구현예정'); }}><i className="fa fa-share-alt"/> Share</button>
+                  <button className="btn btn-info btn-sm btn-raised " onClick={() => { alert('구현예정'); }}><i className="fa fa-share-alt"/></button>
+                  <button className="btn btn-default btn-sm btn-raised" onClick={onModifyClick.bind(this, spot)}><i className="fa fa-edit"/></button>
+                  <button className="btn btn-danger btn-sm btn-raised" onClick={onRemove.bind(this, spot)}><i className="fa fa-remove" /></button>
                 </ButtonGroup>
               </div>
             </div>

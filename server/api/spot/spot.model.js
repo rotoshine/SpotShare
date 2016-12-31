@@ -12,6 +12,10 @@ module.exports = (mongoose, plugins) => {
       type: Date,
       default: Date.now()
     },
+    isDisplay: {
+      type: Boolean,
+      default: true
+    },
     updatedAt: {
       type: Date,
       default: Date.now()
@@ -24,8 +28,11 @@ module.exports = (mongoose, plugins) => {
     geo: { type: [Number], index: '2d' },
     likes: [{
       type: Number,
-      ref: 'User',
-      default: []
+      ref: 'User'
+    }],
+    removeRequestUsers: [{
+      type: Number,
+      ref: 'User'
     }]
   });
 

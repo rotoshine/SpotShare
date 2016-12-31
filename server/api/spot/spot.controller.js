@@ -1,9 +1,12 @@
 'use strict';
 const _ = require('lodash');
+const fs = require('fs');
 const mongoose = require('mongoose');
 const Spot = mongoose.model('Spot');
 const SpotHistory = mongoose.model('SpotHistory');
+const File = mongoose.model('File');
 const handleError = require('../../utils/handleError').handleError;
+const uploadUtils = require('../../utils/uploadUtils');
 
 const loggingError = (err) => {
   console.error(err);
@@ -22,7 +25,8 @@ exports.findAll = (req, res) => {
           [x1, y1], [x2, y2]
         ]
       }
-    }
+    },
+    isDisplay: true
   })
     .populate('createdBy', 'name provider')
     .exec((err, spots) => {
@@ -107,7 +111,40 @@ exports.update = (req, res) => {
 };
 
 exports.remove = (req, res) => {
+  Spot.findById(req.params.spotId)
+    .then(spot => {
+      if(spot.createdBy === req.user._id){
+        spot.isDisplay = false;
+        spot.save().then(() => {
+          return res.status(200).send();
+        });
+      }else{
+        return res.status(401).send();
+      }
+    });
+};
 
+exports.removeRequest = (req, res) => {
+  const requestUserId = req.user._id;
+  Spot.findById(req.params.spotId)
+    .then(spot => {
+      if(!spot.removeRequestUsers){
+        spot.removeRequestUsers = [];
+      }
+
+      if(!_.includes(spot.removeRequestUsers, requestUserId)){
+        spot.removeRequestUsers.push(requestUserId);
+      }
+
+      if(spot.removeRequestUsers.length > 2){
+        spot.isDisplay = false;
+      }
+
+      spot.save().then(() => {
+        return res.status(200).send();
+      });
+    })
+    .catch(loggingError);
 };
 
 exports.like = (req, res) => {
@@ -150,4 +187,3 @@ exports.unlike = (req, res) => {
     });
   });
 };
-

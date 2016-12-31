@@ -29,5 +29,6 @@ module.exports = {
     databaseURL: '',
     storageBucket: '',
     messagingSenderId: ''
-  }
+  },
+  fileUploadPath: './upload'
 };
