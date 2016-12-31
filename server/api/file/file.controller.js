@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 exports.upload = (req, res) => {
 
 };
+
+exports.uploadFileTemp = (req, res) => {
+
+};
+
 exports.findFile = (req, res) => {
   const {fileId} = req.params;
 
