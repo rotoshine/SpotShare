@@ -12,7 +12,7 @@ const upload = multer({
   }
 });
 
-router.post('/files/temp', isAuthenticate, uploadUtils.upload, controller.uploadFileTemp);
-router.post('/spots/:spotId/files', isAuthenticate, uploadUtils.upload, controller.upload);
+router.post('/files/temp', isAuthenticate, upload.single('file'), controller.uploadFileTemp);
+router.post('/spots/:spotId/files', isAuthenticate, upload.single('file'), controller.upload);
 
 module.exports = router;

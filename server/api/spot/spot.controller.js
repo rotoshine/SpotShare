@@ -6,7 +6,6 @@ const Spot = mongoose.model('Spot');
 const SpotHistory = mongoose.model('SpotHistory');
 const File = mongoose.model('File');
 const handleError = require('../../utils/handleError').handleError;
-const uploadUtils = require('../../utils/uploadUtils');
 
 const loggingError = (err) => {
   console.error(err);
