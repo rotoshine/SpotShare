@@ -12,6 +12,7 @@ const upload = multer({
   }
 });
 
+router.get('/spots/:spotId/files/:fileId', controller.findFile);
 router.post('/files/temp', isAuthenticate, upload.single('file'), controller.uploadFileTemp);
 router.post('/spots/:spotId/files', isAuthenticate, upload.single('file'), controller.upload);
 

@@ -7,7 +7,6 @@ const {isAuthenticate} = authUtils;
 
 router.get('/spots', controller.findAll);
 router.get('/spots/:spotId', controller.findById);
-router.get('/spots/:spotId/files/:fileId', controller.findFile);
 router.post('/spots', isAuthenticate, controller.save);
 router.put('/spots/:spotId', isAuthenticate, controller.update);
 router.delete('/spots/:spotId', isAuthenticate, controller.remove);

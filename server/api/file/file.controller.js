@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const fs = require('fs');
+const File = mongoose.model('File');
+
 
 exports.upload = (req, res) => {
 
