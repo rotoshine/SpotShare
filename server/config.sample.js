@@ -30,5 +30,5 @@ module.exports = {
     storageBucket: '',
     messagingSenderId: ''
   },
-  fileUploadPath: './upload'
+  fileUploadPath: './uploads'
 };

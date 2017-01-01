@@ -1,0 +1,2 @@
+export const UPLOAD_START = 'UPLOAD_START';
+export const UPLOAD_COMPLETE = 'UPLOAD_COMPLETE';

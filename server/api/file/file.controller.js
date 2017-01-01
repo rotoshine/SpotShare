@@ -8,7 +8,8 @@ exports.upload = (req, res) => {
 };
 
 exports.uploadFileTemp = (req, res) => {
-
+  console.log(req.files);
+  return res.json(req.files);
 };
 
 exports.findFile = (req, res) => {

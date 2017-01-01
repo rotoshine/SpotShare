@@ -6,15 +6,13 @@ import {Button, Well} from 'react-bootstrap';
 export default class SimpleSpotList extends React.Component {
   static propTypes = {
     spots: PropTypes.array.isRequired,
-    useCurrentPosition: PropTypes.bool,
     onSpotClick: PropTypes.func.isRequired,
     onMouseOver: PropTypes.func.isRequired,
-    onMouseOut: PropTypes.func.isRequired,
-    onCurrentPositionClick: PropTypes.func.isRequired
+    onMouseOut: PropTypes.func.isRequired
   };
 
   render() {
-    const {spots, useCurrentPosition, onSpotClick, onMouseOver, onMouseOut} = this.props;
+    const {spots, onSpotClick, onMouseOver, onMouseOut} = this.props;
 
     let spotListComponents = [];
 
@@ -79,20 +77,12 @@ export default class SimpleSpotList extends React.Component {
       }
     }
 
-    let currentPositionButton = null;
 
-    if (useCurrentPosition) {
-      currentPositionButton = (
-        <Button size="xs" onClick={this.props.onCurrentPositionClick}>
-          <i className="fa fa-location-arrow"/> 현재 위치 찾기</Button>
-      );
-    }
     return (
       <div className="spot-list">
         <ul className="list-unstyled">
           {spotListComponents}
         </ul>
-        {currentPositionButton}
       </div>
     )
   }

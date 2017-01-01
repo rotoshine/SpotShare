@@ -11,9 +11,10 @@ const upload = multer({
     fileSize : 1024 * 1024 * 3
   }
 });
+const MAX_UPLOAD_FILE_COUNT = 5;
 
 router.get('/spots/:spotId/files/:fileId', controller.findFile);
-router.post('/files/temp', isAuthenticate, upload.single('file'), controller.uploadFileTemp);
-router.post('/spots/:spotId/files', isAuthenticate, upload.single('file'), controller.upload);
+router.post('/files/upload', isAuthenticate, upload.array('files', MAX_UPLOAD_FILE_COUNT), controller.uploadFileTemp);
+router.post('/spots/:spotId/files', isAuthenticate, upload.array('files', MAX_UPLOAD_FILE_COUNT), controller.upload);
 
 module.exports = router;

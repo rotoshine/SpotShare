@@ -1,26 +1,54 @@
 import React, {PropTypes} from 'react';
-
+import _ from 'lodash';
+import Dropzone from 'react-dropzone';
 import {Modal, Col, Form, FormGroup, FormControl, ControlLabel, Button} from 'react-bootstrap';
 
 export default class SpotFormModal extends React.Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
     spotForm: PropTypes.object.isRequired,
+    onFileUpload: PropTypes.func.isRequired,
     onFormUpdate: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired
   };
 
-  render () {
-    const {spotForm, visible, onClose, onFormUpdate, onSubmit} = this.props;
+  isValidForm() {
+    const ERROR_CLASS_NAME = 'has-error';
+    const {spotForm} = this.props;
+    const validationFields = ['spotName'];
+
+    let isValid = true;
+    validationFields.forEach((field) => {
+      const value = spotForm[field];
+      const $formGroup = $(`label[for=${field}]`).parents('.form-group');
+
+      if (_.isEmpty(value)) {
+        $formGroup.addClass(ERROR_CLASS_NAME);
+        isValid = false;
+      } else {
+        $formGroup.removeClass(ERROR_CLASS_NAME);
+      }
+    });
+
+    return isValid;
+  }
+
+  renderUploadedFile() {
+    const {files} = this.props.spotForm;
+
+  }
+
+  render() {
+    const {spotForm, visible, onClose, onFormUpdate} = this.props;
 
     return (
-      <Modal show={visible} onHide={onClose}>
+      <Modal bsSize="large" show={visible} onHide={onClose}>
         <Modal.Header closeButton>
           <Modal.Title>스팟 등록하기</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form horizontal onSubmit={onSubmit}>
+          <Form horizontal onSubmit={this.handleSubmit}>
             <FormGroup controlId="spotName">
               <Col componentClass={ControlLabel} xs={3} sm={2}>
                 스팟 이름
@@ -30,7 +58,7 @@ export default class SpotFormModal extends React.Component {
                              placeholder="스팟의 이름을 입력해주세요."
                              value={spotForm.spotName}
                              onChange={(e) => {
-                                onFormUpdate('spotName', e.target.value);
+                               onFormUpdate('spotName', e.target.value);
                              }}
                 />
               </Col>
@@ -44,7 +72,7 @@ export default class SpotFormModal extends React.Component {
                              rows="10"
                              value={spotForm.description}
                              onChange={(e) => {
-                                onFormUpdate('description', e.target.value);
+                               onFormUpdate('description', e.target.value);
                              }}/>
               </Col>
             </FormGroup>
@@ -60,9 +88,28 @@ export default class SpotFormModal extends React.Component {
                        readOnly/>
               </Col>
             </FormGroup>
-
+            <Dropzone ref="dropzone"
+                      id="dropzone"
+                      disableClick={true}
+                      className="file-dropzone"
+                      onDrop={this.handleFileUpload}>
+              <Col xs={12}>
+                <div className="alert alert-info">파일을 이곳에 drag&drap 하거나 + 버튼을 눌러서 이미지를 업로드 할 수 있어요.</div>
+                <ul className="list-unstyled upload-file-list">
+                  {this.renderUploadedFile()}
+                  <li className="upload-file upload-button">
+                    <button className="button-unstyled" onClick={this.handleUploadButtonClick}>
+                      <div style={{paddingTop:23}}>
+                        <i className="fa fa-2x fa-plus" style={{marginRight:7}}/>
+                        <i className="fa fa-3x fa-image"/>
+                      </div>
+                    </button>
+                  </li>
+                </ul>
+              </Col>
+            </Dropzone>
             <FormGroup>
-              <Button bsStyle="primary" type="submit" style={{width:'100%'}} className="btn-raised">
+              <Button bsStyle="primary" type="submit" style={{width: '100%'}} className="btn-raised">
                 <i className="fa fa-save"/> {spotForm._id ? '수정' : '등록'}
               </Button>
             </FormGroup>
@@ -71,4 +118,21 @@ export default class SpotFormModal extends React.Component {
       </Modal>
     );
   }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (this.isValidForm()) {
+      this.props.onSubmit();
+    }
+  };
+
+  handleUploadButtonClick = (e) => {
+    e.preventDefault();
+    this.refs.dropzone.open();
+  };
+
+  handleFileUpload = (acceptedFiles) => {
+    this.props.onFileUpload(this.props.spotForm._id, acceptedFiles);
+  };
 }

@@ -6,6 +6,18 @@ html, body, .root {
   font-family: 'Nanum Gothic', sans-serif;
 }
 
+/* utils */
+.bg-center {
+  background-position:center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.button-unstyled {
+  border: none;
+  background: none;
+}
+
 .navbar-collapse {
   z-index: 100;
   background-color: #3f51b5;
@@ -36,6 +48,18 @@ html, body, .root {
   z-index: 5;
   padding: 5px;
 }
+
+.current-position {
+  padding: 0;
+  position: absolute;
+  border-radius: 20px;
+  width: 40px !important;
+  height: 40px;
+  top: 5px;
+  left: 10px;
+  z-index: 5;
+}
+
 .map-wrapper .map{
   width:75%;
   height: 100%;
@@ -146,4 +170,31 @@ html, body, .root {
 .spot-detail-contents-container .spot-detail-modal-contents{
   padding-left:10px;
   width: 50%;
+}
+
+.file-dropzone{
+  width: 100%;
+  height: 120px;
+}
+
+/* spot form */
+.upload-file-list li {
+  display: inline-block;
+}
+.upload-file {
+  float:left;
+  position: relative;
+  border: 1px solid #ddd;
+  width: 100px;
+  height: 100px;
+}
+
+.uploaded-file.upload-button {
+
+}
+
+.uploaded-file .remove-button {
+  position: absolute;
+  right: 10px;
+  top: 10px;
 }

@@ -4,10 +4,12 @@ import {bindActionCreators} from 'redux';
 import $ from 'jquery';
 import _ from 'lodash';
 
+// action creators
 import * as SpotActionCreators from '../actions/SpotsActionCreators';
 import * as CommentActionCreators from '../actions/CommentActionCreators';
+import * as FileActionCreators from '../actions/FileActionCreators';
 
-import {Well, Input} from 'react-bootstrap';
+import {Well, Input, Button} from 'react-bootstrap';
 
 
 import App from '../App';
@@ -51,6 +53,7 @@ class SpotMapContainer extends React.Component {
 
     this.actions = bindActionCreators(SpotActionCreators, dispatch);
     this.commentActions = bindActionCreators(CommentActionCreators, dispatch);
+    this.fileActions = bindActionCreators(FileActionCreators, dispatch);
 
     this.markers = [];
 
@@ -110,11 +113,11 @@ class SpotMapContainer extends React.Component {
       this.markers = [];
 
       this.fetchSpots();
-      this.registEvents();
+      this.registMapEvents();
     });
   }
 
-  registEvents() {
+  registMapEvents() {
     if (this.map !== null) {
       const {event} = daum.maps;
       const map = this.map;
@@ -143,7 +146,7 @@ class SpotMapContainer extends React.Component {
     };
     if (spotForm._id) {
       this.actions.modifySpot(spotForm).then(createOrUpdateAfterCallback);
-    }else{
+    } else {
       this.actions.createSpot(this.props.spotForm).then(createOrUpdateAfterCallback);
     }
   }
@@ -295,7 +298,7 @@ class SpotMapContainer extends React.Component {
             alert('gps를 켜주세요.');
             defaultHandler();
           }, {
-            timeout: 1000 * 3
+            timeout: 1000 * 5
           });
         } else {
           defaultHandler();
@@ -311,6 +314,18 @@ class SpotMapContainer extends React.Component {
       this.map.setCenter(new daum.maps.LatLng(latLng.latitude, latLng.longitude));
     });
 
+  }
+
+  renderCurrentPositionButton() {
+    //if(this.state.useCurrentPosition){
+    return (
+      <Button className="current-position btn-raised" onClick={this.handleCurrentPositionClick}>
+        <i className="fa fa-location-arrow"/>
+      </Button>
+    );
+    //}else{
+    //  return null;
+    //}
   }
 
   render() {
@@ -336,8 +351,10 @@ class SpotMapContainer extends React.Component {
                        spotForm={spotForm}
                        onFormUpdate={this.actions.updateSpotForm}
                        onClose={this.handleModalClose}
-                       onSubmit={this.handleSpotFormSubmit}/>
+                       onSubmit={this.handleSpotFormSubmit}
+                       onFileUpload={this.handleFileUpload}/>
         <div className="map-wrapper flex-container">
+          {this.renderCurrentPositionButton()}
           <Well className="map-tooltip">{user.isLogin ?
             '스팟을 등록하려면 해당 위치를 더블클릭 하세요' :
             '스팟을 등록하려면 로그인 하세요.'}.
@@ -345,11 +362,9 @@ class SpotMapContainer extends React.Component {
           <div className="map" id="spot-map"/>
           <div className="map-control">
             <SimpleSpotList spots={spots}
-                            useCurrentPosition={this.state.useCurrentPosition}
                             onSpotClick={this.handleSimpleSpotListClick}
                             onMouseOver={this.handleMouseOver}
-                            onMouseOut={this.handleMouseOut}
-                            onCurrentPositionClick={this.handleCurrentPositionClick}/>
+                            onMouseOut={this.handleMouseOut}/>
           </div>
         </div>
       </App>
@@ -372,8 +387,7 @@ class SpotMapContainer extends React.Component {
     });
   };
 
-  handleSpotFormSubmit = (e) => {
-    e.preventDefault();
+  handleSpotFormSubmit = () => {
     this.createOrUpdateSpot();
     this.handleModalClose();
   };
@@ -389,8 +403,8 @@ class SpotMapContainer extends React.Component {
     this.setCurrentPosition();
   };
 
-  handleSpotLike = () => {
-    // 현재 선택된 스팟에서 id 뽑아서 action 보내기~
+  handleSpotLike = (spotId) => {
+    this.actions.likeSpot(spotId);
   };
 
   handleMouseOver = (spotId) => {
@@ -409,10 +423,10 @@ class SpotMapContainer extends React.Component {
   };
 
   handleSpotModifyClick = (spot) => {
-    if(this.state.user.isLogin){
+    if (this.state.user.isLogin) {
       this.handleModalClose();
       this.showModifySpotFormModal(spot);
-    }else{
+    } else {
       alert('로그인 후 수정 가능합니다.');
     }
   };
@@ -424,18 +438,24 @@ class SpotMapContainer extends React.Component {
       this.handleModalClose();
       this.fetchSpots();
     };
-    if(user.isLogin){
-      if(user._id === spot.createdBy._id){
-        if(confirm('공유하신 스팟을 삭제하시겠습니까?')){
+    if (user.isLogin) {
+      if (user._id === spot.createdBy._id) {
+        if (confirm('공유하신 스팟을 삭제하시겠습니까?')) {
           this.actions.removeSpot(spot._id).then(removeAfterCallback);
         }
-      }else{
-        if(confirm('등록한 사용자가 아니기 때문에 삭제요청만 가능합니다.\n삭제요청하시겠습니까?')){
+      } else {
+        if (confirm('등록한 사용자가 아니기 때문에 삭제요청만 가능합니다.\n삭제요청하시겠습니까?')) {
           this.actions.removeRequestSpot(spot._id).then(removeAfterCallback);
         }
       }
-    }else{
+    } else {
       alert('로그인 하세요.');
+    }
+  };
+
+  handleFileUpload = (spotId, files) => {
+    if(files.length > 0){
+      this.fileActions.upload(spotId, files);
     }
   };
 }

@@ -17,7 +17,8 @@ const initialSpotsState = {
     spotName: '',
     description: '',
     address: '',
-    geo: []
+    geo: [],
+    files: []
   },
   height: 0
 };
@@ -47,7 +48,8 @@ function spots(state = initialSpotsState, action) {
           spotName: action.spotForm.spotName,
           description: action.spotForm.description,
           address: action.spotForm.address,
-          geo: action.spotForm.geo
+          geo: action.spotForm.geo,
+          files: action.spotForm.files
         }
       });
     case UPDATE_SPOT_FORM:
