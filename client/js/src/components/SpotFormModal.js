@@ -41,7 +41,6 @@ export default class SpotFormModal extends React.Component {
     let uploadedFiles = [];
 
     files.forEach((spotFile, i) => {
-      console.log(spotFile);
       let fileUrl = `/api/files/upload/temp/${spotFile.filename}`;
 
       if(spotForm.hasOwnProperty('_id') && spotFile.hasOwnProperty('_id')){
@@ -122,6 +121,7 @@ export default class SpotFormModal extends React.Component {
                       id="dropzone"
                       disableClick={true}
                       className="file-dropzone"
+                      accept="image/*"
                       onDrop={this.handleFileUpload}>
               <Col xs={12}>
                 <div className="alert alert-info">파일을 이곳에 drag&drap 하거나 + 버튼을 눌러서 이미지를 업로드 할 수 있어요.</div>
