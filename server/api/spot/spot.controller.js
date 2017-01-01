@@ -4,7 +4,6 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 const Spot = mongoose.model('Spot');
 const SpotHistory = mongoose.model('SpotHistory');
-const File = mongoose.model('File');
 const handleError = require('../../utils/handleError').handleError;
 
 const loggingError = (err) => {
@@ -17,16 +16,18 @@ exports.findAll = (req, res) => {
   let y1 = queryParams.y1;
   let y2 = queryParams.y2;
 
-  return Spot.find({
-    geo: {
-      $geoWithin: {
-        $box: [
-          [x1, y1], [x2, y2]
-        ]
-      }
-    },
-    isDisplay: true
-  })
+  return Spot
+    .find({
+      geo: {
+        $geoWithin: {
+          $box: [
+            [x1, y1], [x2, y2]
+          ]
+        }
+      },
+      isDisplay: true
+    })
+    .populate('files', '_id')
     .populate('createdBy', 'name provider')
     .exec((err, spots) => {
       if (err) {
@@ -44,25 +45,32 @@ exports.findAll = (req, res) => {
 exports.findById = (req, res) => {
   const spotId = req.params.spotId;
 
-  return Spot.findById(spotId, (err, spot) => {
-    handleError(err, res, () => {
-      return res.json({
-        spot: spot
-      });
+  return Spot
+    .findById(spotId)
+    .populate('files', '_id')
+    .exec()
+    .then((spot) => {
+      return res.json(spot);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: err.message
+      })
     });
-  });
 };
 
 exports.save = (req, res) => {
   let body = req.body;
+  delete body.uploadedFiles;
 
   let spot = new Spot(body);
   spot.createdBy = req.user._id;
 
+  console.log(spot);
   return spot
     .save()
-    .then(() => {
-      return res.send();
+    .then((savedSpot) => {
+      return res.json(savedSpot);
     })
     .catch(loggingError);
 };
@@ -93,18 +101,14 @@ exports.update = (req, res) => {
           .save()
           .then(() => {
             return spot.save()
-              .then(() => {
-                return res.status(200).json({
-                  result: 'success'
-                });
+              .then((updatedSpot) => {
+                return res.status(200).json(updatedSpot);
               })
               .catch(loggingError);
           })
           .catch(loggingError);
-      }else{
-        return res.status(200).json({
-          result: 'not update.'
-        });
+      } else {
+        return res.status(200).json(spot);
       }
     });
 };
@@ -112,12 +116,12 @@ exports.update = (req, res) => {
 exports.remove = (req, res) => {
   Spot.findById(req.params.spotId)
     .then(spot => {
-      if(spot.createdBy === req.user._id){
+      if (spot.createdBy === req.user._id) {
         spot.isDisplay = false;
         spot.save().then(() => {
           return res.status(200).send();
         });
-      }else{
+      } else {
         return res.status(401).send();
       }
     });
@@ -127,15 +131,15 @@ exports.removeRequest = (req, res) => {
   const requestUserId = req.user._id;
   Spot.findById(req.params.spotId)
     .then(spot => {
-      if(!spot.removeRequestUsers){
+      if (!spot.removeRequestUsers) {
         spot.removeRequestUsers = [];
       }
 
-      if(!_.includes(spot.removeRequestUsers, requestUserId)){
+      if (!_.includes(spot.removeRequestUsers, requestUserId)) {
         spot.removeRequestUsers.push(requestUserId);
       }
 
-      if(spot.removeRequestUsers.length > 2){
+      if (spot.removeRequestUsers.length > 2) {
         spot.isDisplay = false;
       }
 

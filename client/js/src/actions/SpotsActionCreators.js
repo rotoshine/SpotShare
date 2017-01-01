@@ -24,24 +24,43 @@ export function requestSpots(x1, y1, x2, y2) {
   return fetchSpots(x1, y1, x2, y2);
 }
 
-export function createSpot(newSpot) {
+export function createOrUpdateSpot(spot) {
+  const uploadedFiles = spot.files;
+  delete spot.files;
   return (dispatch) => {
-    dispatch({
-      type: Actions.CREATE_SPOT,
-      spot: newSpot
-    });
+    return new Promise((resolve, reject) => {
+      if (spot._id) {
+        dispatch({
+          type: Actions.MODIFY_SPOT,
+          spot: spot
+        });
+        return axios.put(`/api/spots/${spot._id}`, spot).then((result) => {
+          resolve(result.data);
+        });
+      } else {
+        dispatch({
+          type: Actions.CREATE_SPOT,
+          spot: spot
+        });
 
-    return axios.post('/api/spots', newSpot);
-  };
-}
+        return axios.post('/api/spots', spot).then(result => {
+          const savedSpot = result.data;
+          dispatch({
+            type: Actions.SAVE_SPOT_TEMP_FILES
+          });
 
-export function modifySpot(spot) {
-  return (dispatch) => {
-    dispatch({
-      type: Actions.MODIFY_SPOT,
-      spot: spot
+          axios
+            .post(`/api/spots/${savedSpot._id}/files/temp-files-save`, {
+              tempUploadedFiles: uploadedFiles
+            })
+            .then((result) => {
+              savedSpot.files = result.data;
+              return resolve(savedSpot);
+            })
+            .catch(reject);
+        }).catch(reject);
+      }
     });
-    return axios.put(`/api/spots/${spot._id}`, spot);
   }
 }
 

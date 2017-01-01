@@ -31,6 +31,7 @@ if(isDevMode){
   const compiler = webpack(webpackConfig);
   app.use(webpackMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
+    noInfo: true,
     hot: true,
     historyApiFallback: true
   }));

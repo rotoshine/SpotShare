@@ -10,3 +10,5 @@ export const LIKE_SPOT = 'LIKE_SPOT';
 export const SET_SPOT_FORM = 'SET_SPOT_FORM';
 export const UPDATE_SPOT_FORM = 'UPDATE_SPOT_FORM';
 export const RESET_SPOT_FORM = 'RESET_SPOT_FORM';
+
+export const SAVE_SPOT_TEMP_FILES = 'SAVE_SPOT_TEMP_FILES';

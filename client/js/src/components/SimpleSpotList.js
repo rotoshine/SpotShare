@@ -5,6 +5,7 @@ import {Button, Well} from 'react-bootstrap';
 
 export default class SimpleSpotList extends React.Component {
   static propTypes = {
+    nowLoading: PropTypes.bool.isRequired,
     spots: PropTypes.array.isRequired,
     onSpotClick: PropTypes.func.isRequired,
     onMouseOver: PropTypes.func.isRequired,
@@ -12,8 +13,13 @@ export default class SimpleSpotList extends React.Component {
   };
 
   render() {
-    const {spots, onSpotClick, onMouseOver, onMouseOut} = this.props;
+    const {nowLoading, spots, onSpotClick, onMouseOver, onMouseOut} = this.props;
 
+    if(nowLoading){
+      return (
+        <Well>로딩 중입니다...</Well>
+      );
+    }
     let spotListComponents = [];
 
     if (_.isArray(spots)) {
@@ -42,8 +48,8 @@ export default class SimpleSpotList extends React.Component {
       spotsPartial.forEach((spot, i) => {
         let imageUrl = defaultImageUrl;
 
-        if(spot.images){
-          imageUrl = `/api/spots/${spot._id}/files/${spot.images[0]._id}`
+        if(_.isArray(spot.files) && spot.files.length > 0){
+          imageUrl = `/api/spots/${spot._id}/files/${spot.files[0]._id}`
         }
         let spotPhotoStyle = {
           backgroundImage: `url('${imageUrl}')`

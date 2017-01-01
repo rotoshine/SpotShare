@@ -34,8 +34,39 @@ export default class SpotFormModal extends React.Component {
     return isValid;
   }
 
-  renderUploadedFile() {
-    const {files} = this.props.spotForm;
+  renderUploadFile() {
+    const {spotForm} = this.props;
+    const {files} = spotForm;
+
+    let uploadedFiles = [];
+
+    files.forEach((spotFile, i) => {
+      console.log(spotFile);
+      let fileUrl = `/api/files/upload/temp/${spotFile.filename}`;
+
+      if(spotForm.hasOwnProperty('_id') && spotFile.hasOwnProperty('_id')){
+        fileUrl = `/api/spots/${spotForm._id}/files/${spotFile._id}`;
+      }
+      uploadedFiles.push(
+        <li key={i}
+            className="upload-file bg-center"
+            style={{backgroundImage: `url('${fileUrl}')`}} />
+      );
+    });
+
+    return (
+      <ul className="list-unstyled upload-file-list">
+        {uploadedFiles}
+        <li key="upload-trigger" className="upload-file upload-button">
+          <button className="button-unstyled" onClick={this.handleUploadButtonClick}>
+            <div style={{paddingTop:23}}>
+              <i className="fa fa-2x fa-plus" style={{marginRight:7}}/>
+              <i className="fa fa-3x fa-image"/>
+            </div>
+          </button>
+        </li>
+      </ul>
+    )
 
   }
 
@@ -59,8 +90,7 @@ export default class SpotFormModal extends React.Component {
                              value={spotForm.spotName}
                              onChange={(e) => {
                                onFormUpdate('spotName', e.target.value);
-                             }}
-                />
+                             }} />
               </Col>
             </FormGroup>
             <FormGroup controlId="description">
@@ -95,17 +125,7 @@ export default class SpotFormModal extends React.Component {
                       onDrop={this.handleFileUpload}>
               <Col xs={12}>
                 <div className="alert alert-info">파일을 이곳에 drag&drap 하거나 + 버튼을 눌러서 이미지를 업로드 할 수 있어요.</div>
-                <ul className="list-unstyled upload-file-list">
-                  {this.renderUploadedFile()}
-                  <li className="upload-file upload-button">
-                    <button className="button-unstyled" onClick={this.handleUploadButtonClick}>
-                      <div style={{paddingTop:23}}>
-                        <i className="fa fa-2x fa-plus" style={{marginRight:7}}/>
-                        <i className="fa fa-3x fa-image"/>
-                      </div>
-                    </button>
-                  </li>
-                </ul>
+                {this.renderUploadFile()}
               </Col>
             </Dropzone>
             <FormGroup>

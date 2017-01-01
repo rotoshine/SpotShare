@@ -28,11 +28,18 @@ module.exports = (mongoose, plugins) => {
     geo: { type: [Number], index: '2d' },
     likes: [{
       type: Number,
-      ref: 'User'
+      ref: 'User',
+      default: []
     }],
     removeRequestUsers: [{
       type: Number,
-      ref: 'User'
+      ref: 'User',
+      default: []
+    }],
+    files: [{
+      type: Number,
+      ref: 'SpotFile',
+      default: []
     }]
   });
 

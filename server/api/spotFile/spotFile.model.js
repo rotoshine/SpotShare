@@ -1,13 +1,17 @@
 'use strict';
 
 module.exports = (mongoose, plugins) => {
-  const SCHEMA_NAME = 'File';
+  const SCHEMA_NAME = 'SpotFile';
   const Schema = mongoose.Schema;
 
   const ModelSchema = new Schema({
     spot: {
       type: Number,
       ref: 'Spot',
+      required: true
+    },
+    originalFileName: {
+      type: String,
       required: true
     },
     filePath: {

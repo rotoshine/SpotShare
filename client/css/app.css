@@ -162,11 +162,24 @@ html, body, .root {
   flex-direction:row;
 }
 
-.spot-detail-contents-container .road-view{
+.spot-detail-contents-container .spot-detail-media{
   width: 50%;
   height: 300px;
+  border: 1px solid #ccc;
 }
 
+.spot-detail-contents-container .spot-detail-media .road-view{
+  width: 100%;
+  height: 100%;
+}
+
+.spot-detail-media-thumbnail {
+  cursor: pointer;
+  float: left;
+  width: 70px;
+  height: 70px;
+  border: 1px solid #ccc;
+}
 .spot-detail-contents-container .spot-detail-modal-contents{
   padding-left:10px;
   width: 50%;

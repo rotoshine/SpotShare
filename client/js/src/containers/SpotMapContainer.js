@@ -7,7 +7,7 @@ import _ from 'lodash';
 // action creators
 import * as SpotActionCreators from '../actions/SpotsActionCreators';
 import * as CommentActionCreators from '../actions/CommentActionCreators';
-import * as FileActionCreators from '../actions/FileActionCreators';
+import * as SpotFileActionCreators from '../actions/SpotFileActionCreators';
 
 import {Well, Input, Button} from 'react-bootstrap';
 
@@ -53,7 +53,7 @@ class SpotMapContainer extends React.Component {
 
     this.actions = bindActionCreators(SpotActionCreators, dispatch);
     this.commentActions = bindActionCreators(CommentActionCreators, dispatch);
-    this.fileActions = bindActionCreators(FileActionCreators, dispatch);
+    this.spotFileActions = bindActionCreators(SpotFileActionCreators, dispatch);
 
     this.markers = [];
 
@@ -139,16 +139,14 @@ class SpotMapContainer extends React.Component {
 
   createOrUpdateSpot() {
     const {spotForm} = this.props;
-    const createOrUpdateAfterCallback = () => {
-      this.actions.resetSpotForm();
-      this.fetchSpots();
-      this.handleModalClose();
-    };
-    if (spotForm._id) {
-      this.actions.modifySpot(spotForm).then(createOrUpdateAfterCallback);
-    } else {
-      this.actions.createSpot(this.props.spotForm).then(createOrUpdateAfterCallback);
-    }
+    this.actions
+      .createOrUpdateSpot(spotForm)
+      .then((spot) => {
+        this.actions.resetSpotForm();
+        this.fetchSpots();
+        this.handleModalClose();
+        this.showSpotDetail(spot);
+      });
   }
 
   fetchSpots() {
@@ -330,7 +328,7 @@ class SpotMapContainer extends React.Component {
 
   render() {
     const {formModal, detailDisplayModal, user} = this.state;
-    const {spots, spotForm} = this.props;
+    const {spots, spotForm, nowLoading} = this.props;
 
     const {createComment, removeComment} = this.commentActions;
 
@@ -362,6 +360,7 @@ class SpotMapContainer extends React.Component {
           <div className="map" id="spot-map"/>
           <div className="map-control">
             <SimpleSpotList spots={spots}
+                            nowLoading={nowLoading}
                             onSpotClick={this.handleSimpleSpotListClick}
                             onMouseOver={this.handleMouseOver}
                             onMouseOut={this.handleMouseOut}/>
@@ -454,8 +453,8 @@ class SpotMapContainer extends React.Component {
   };
 
   handleFileUpload = (spotId, files) => {
-    if(files.length > 0){
-      this.fileActions.upload(spotId, files);
+    if (files.length > 0) {
+      this.spotFileActions.upload(spotId, files);
     }
   };
 }

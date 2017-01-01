@@ -66,7 +66,8 @@ function spots(state = initialSpotsState, action) {
           spotName: '',
           description: '',
           address: '',
-          geo: []
+          geo: [],
+          files: []
         }
       });
     default:
