@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import _ from 'lodash';
 
-import {Button} from 'react-bootstrap';
+import {Button, Well} from 'react-bootstrap';
 
 export default class SimpleSpotList extends React.Component {
   static propTypes = {
@@ -21,7 +21,12 @@ export default class SimpleSpotList extends React.Component {
     if (_.isArray(spots)) {
       if (spots.length === 0) {
         spotListComponents.push(
-          <li key="empty">이 지역엔 공유된 장소가 없습니다.</li>
+          <li key="empty">
+            <Well className="text-center">
+              <img src="/images/errors/404.jpg" alt="404 image" width="100%"/>
+              <strong>이 지역엔 공유된 장소가 없습니다.</strong>
+            </Well>
+          </li>
         );
       }else{
         spotListComponents.push(
@@ -35,15 +40,25 @@ export default class SimpleSpotList extends React.Component {
         hasMoreSpots = true;
         spotsPartial = spots.slice(0, 10);
       }
+      const defaultImageUrl = '/images/food_tool.svg';
       spotsPartial.forEach((spot, i) => {
+        let imageUrl = defaultImageUrl;
+
+        if(spot.images){
+          imageUrl = `/api/spots/${spot._id}/files/${spot.images[0]._id}`
+        }
+        let spotPhotoStyle = {
+          backgroundImage: `url('${imageUrl}')`
+        };
+
         spotListComponents.push(
           <li key={i}>
             <a href="#" onClick={onSpotClick.bind(this, spot)}
                onMouseOver={onMouseOver.bind(this, spot._id)}
                onMouseOut={onMouseOut.bind(this, spot._id)}>
               <div className="spot-item">
-                <div className="spot-photo"/>
-                <div className="spot-detail">
+                <div className="spot-photo" style={spotPhotoStyle}/>
+                <div className="spot-description">
                   <h3 className="spot-name">
                     {spot.spotName}
                   </h3>

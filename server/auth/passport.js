@@ -76,30 +76,30 @@ module.exports = (app, passport, config) => {
   });
 
   for(let providerName in config.auth){
+    if(Providers.hasOwnProperty(providerName)){
       const authConfig = config.auth[providerName];
       const provider = Providers[providerName];
 
-      if(provider){
-        passport.use(new provider.strategy(authConfig, (accessToken, refreshToken, profile, done) => {
-          return oauthConnect(providerName, profile, done);
-        }));
+      passport.use(new provider.strategy(authConfig, (accessToken, refreshToken, profile, done) => {
+        return oauthConnect(providerName, profile, done);
+      }));
 
 
-        let passportParams = {
-          session: true
-        };
+      let passportParams = {
+        session: true
+      };
 
-        if(provider.scope){
-          passportParams.scope = provider.scope;
-        }
-        app.get(`/auth/${providerName}/login`, passport.authenticate(providerName, passportParams));
-        app.get(`/auth/${providerName}/login/callback`, passport.authenticate(providerName, {
-          session: true,
-          successRedirect: '/'
-        }));
-
-        console.log(`[AUTH] ${providerName} enable.`);
+      if(provider.scope){
+        passportParams.scope = provider.scope;
       }
+      app.get(`/auth/${providerName}/login`, passport.authenticate(providerName, passportParams));
+      app.get(`/auth/${providerName}/login/callback`, passport.authenticate(providerName, {
+        session: true,
+        successRedirect: '/'
+      }));
+
+      console.log(`[AUTH] ${providerName} enable.`);
+    }
   }
 
   app.get('/api/me', passport.authenticate('facebook', {session: true}), (req, res) => {

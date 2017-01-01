@@ -52,7 +52,10 @@ const mongooseConnection = mongoose.connect(config.mongo);
 // session
 app.use(session({
   secret: config.sessionSecret || 'roto_is_good_programmer',
-  store: new MongoStore({ mongooseConnection: mongoose.connection })
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+
+  })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
