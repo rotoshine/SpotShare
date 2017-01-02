@@ -121,7 +121,7 @@ export default class SpotFormModal extends React.Component {
                       id="dropzone"
                       disableClick={true}
                       className="file-dropzone"
-                      accept="image/*"
+                      accept="images/*"
                       inputProps={{capture: 'gallary'}}
                       onDrop={this.handleFileUpload}>
               <Col xs={12}>
