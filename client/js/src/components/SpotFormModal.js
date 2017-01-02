@@ -122,6 +122,7 @@ export default class SpotFormModal extends React.Component {
                       disableClick={true}
                       className="file-dropzone"
                       accept="image/*"
+                      inputProps={{capture: 'gallary'}}
                       onDrop={this.handleFileUpload}>
               <Col xs={12}>
                 <div className="alert alert-info">파일을 이곳에 drag&drap 하거나 + 버튼을 눌러서 이미지를 업로드 할 수 있어요.</div>

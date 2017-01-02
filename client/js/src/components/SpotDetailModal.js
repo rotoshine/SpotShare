@@ -127,12 +127,15 @@ export default class SpotDetailModal extends React.Component {
     if(!visibleRoadView && visibleImageIndex > -1){
       const file = spot.files[visibleImageIndex];
       let fileId = null;
-      if(_.isNumber(file)){
-        fileId = file;
-      }else{
+      if(_.isObject(file) && file.hasOwnProperty('_id')){
         fileId = file._id;
+      }else if(_.isNumber(fileId)){
+        fileId = file;
       }
-      style.backgroundImage = `url('/api/spots/${spot._id}/files/${fileId}')`;
+
+      if(_.isNumber(fileId)){
+        style.backgroundImage = `url('/api/spots/${spot._id}/files/${fileId}')`;
+      }
     }
 
     return (
