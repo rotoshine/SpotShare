@@ -8,7 +8,7 @@ const {isAuthenticate} = authUtils;
 const upload = multer({
   dest: config.fileUploadPath,
   limits: {
-    fileSize : 1024 * 1024 * 3
+    fileSize : 1024 * 1024 * 10
   }
 });
 const MAX_UPLOAD_FILE_COUNT = 5;
