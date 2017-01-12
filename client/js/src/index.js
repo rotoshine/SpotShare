@@ -1,21 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, Route, browserHistory} from 'react-router';
+import {Router, browserHistory} from 'react-router';
 import { Provider } from 'react-redux';
 
 import configureStore from './store/configureStore';
+
+import routes from './routes';
+
 // containers
-import SpotMapContainer from './containers/SpotMapContainer';
-import SpotListStyleContainer from './containers/SpotListStyleContainer';
-const store = configureStore();
+
+const preloadedState = window.__PRELOADED_STATE__;
+const store = configureStore(preloadedState);
 
 const rootInstance = ReactDOM.render(
   (
     <Provider store={store}>
-      <Router history={browserHistory}>
-        <Route path="/" component={SpotMapContainer}/>
-        <Route path="/spots" component={SpotListStyleContainer} />
-      </Router>
+      <Router history={browserHistory} routes={routes} />
     </Provider>
   ), document.getElementById('root'));
 

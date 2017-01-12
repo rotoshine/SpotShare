@@ -5,7 +5,8 @@ const authUtils = require('../../auth/authUtils');
 
 const {isAuthenticate} = authUtils;
 
-router.get('/spots', controller.findAll);
+router.get('/spots', controller.find);
+router.get('/spots/with-coordinates', controller.findWithCoordinates);
 router.get('/spots/:spotId', controller.findById);
 router.post('/spots', isAuthenticate, controller.save);
 router.put('/spots/:spotId', isAuthenticate, controller.update);

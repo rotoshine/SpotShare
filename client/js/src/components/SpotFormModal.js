@@ -117,7 +117,7 @@ export default class SpotFormModal extends React.Component {
                        readOnly/>
               </Col>
             </FormGroup>
-            <Dropzone ref="dropzone"
+            <Dropzone ref={(dropzone) => { this.dropzone = dropzone; }}
                       id="dropzone"
                       disableClick={true}
                       className="file-dropzone"
@@ -150,7 +150,7 @@ export default class SpotFormModal extends React.Component {
 
   handleUploadButtonClick = (e) => {
     e.preventDefault();
-    this.refs.dropzone.open();
+    this.dropzone.open();
   };
 
   handleFileUpload = (acceptedFiles) => {

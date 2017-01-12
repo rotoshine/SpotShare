@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "description": "지도 기반 장소 공유 웹 애플리케이션",
   "scripts": {
-    "nodemon": "nodemon server/app.js --mode development",
-    "start-dev": "node server/app.js --mode development",
-    "start": "webpack --mode production && node server/app.js --mode production",
+    "nodemon": "nodemon --exec babel-node server/app.js --mode development",
+    "start-dev": "babel-node server/app.js --mode development",
+    "start": "webpack --mode production && babel-node server/app.js --mode production",
     "lint": "eslint src",
     "prenodemon": "npm install",
     "preinstall": "npm prune",
@@ -27,6 +27,7 @@
     "url": "https://github.com/rotoshine/board-spot/issues"
   },
   "devDependencies": {
+    "babel-cli": "^6.18.0",
     "babel-core": "^6.0.20",
     "babel-eslint": "^4.1.3",
     "babel-loader": "^6.0.1",
@@ -83,6 +84,7 @@
     "react-router-bootstrap": "^0.23.1",
     "react-router-redux": "^4.0.4",
     "redux": "^3.5.2",
-    "redux-thunk": "^2.1.0"
+    "redux-thunk": "^2.1.0",
+    "winston": "^2.3.0"
   }
 }

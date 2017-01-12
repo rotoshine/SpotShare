@@ -1,8 +1,10 @@
-import spotReducers from './spotsReducers';
+import appReducer from './appReducer';
+import spotReducer from './spotsReducer';
 import commentsReducer from './commentsReducer';
 import {combineReducers} from 'redux';
 
 export default combineReducers({
-  ...spotReducers,
+  ...appReducer,
+  ...spotReducer,
   ...commentsReducer
 });

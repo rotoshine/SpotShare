@@ -1,40 +1,40 @@
 import React, {PropTypes} from 'react';
-import {Navbar, Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
+import {connect} from 'react-redux';
+import {Navbar, Nav, NavItem} from 'react-bootstrap';
+import {LinkContainer} from 'react-router-bootstrap';
 
 /**
  * App Component
  */
-export default class App extends React.Component {
+class App extends React.Component {
   static propTypes = {
-    children: PropTypes.oneOfType([PropTypes.element, PropTypes.array]).isRequired
-  };
-
-  state = {
-    user: JSON.parse(document.getElementById('user').innerHTML),
-    providers: JSON.parse(document.getElementById('providers').innerHTML),
-    title: $('title').html()
+    user: PropTypes.object.isRequired,
+    providers: PropTypes.array.isRequired,
+    title: PropTypes.string.isRequired,
+    children: PropTypes.oneOfType([PropTypes.element, PropTypes.array])
   };
 
   componentDidMount() {
-    window.$.material.init();
+    window & window.$ && window.$.material.init();
   }
 
   renderLoginProviders() {
-    const {user} = this.state;
-    if(user.isLogin){
+    const {user} = this.props;
+    if (user.isLogin) {
       return (
         <li eventKey={1} key={1}>
-          <div className="bs-components" style={{marginTop:10}}>
+          <div className="bs-components" style={{marginTop: 10}}>
             <a href="/logout" className="btn btn-raised btn-xs btn-danger">Logout</a>
           </div>
         </li>
       );
-    }else{
+    } else {
       let authButtons = [];
-      this.state.providers.forEach((provider, i) => {
+      this.props.providers.forEach((provider, i) => {
         authButtons.push(
-          <NavItem eventKey={i} key={i} href={`/auth/${provider}/login`} className={`btn-raised auth-button-${provider}`}>
-            <i className={`fa fa-${provider}`} /> Login
+          <NavItem eventKey={i} key={i} href={`/auth/${provider}/login`}
+                   className={`btn-raised auth-button-${provider}`}>
+            <i className={`fa fa-${provider}`}/> Login
           </NavItem>
         );
       });
@@ -43,31 +43,39 @@ export default class App extends React.Component {
     }
 
   }
+
   render() {
-    const {user} = this.state;
+    const {user} = this.props;
 
     let userComponent = null;
 
     if (user.isLogin) {
       userComponent = (
         <NavItem>
-          <span className="label label-info">Hello <i className={`fa fa-${user.provider}`} />{user.name}!</span>
+          <span className="label label-info">Hello <i className={`fa fa-${user.provider}`}/>{user.name}!</span>
         </NavItem>
       );
     }
 
     return (
       <section style={{width: '100%', height: '100%'}}>
-        <Navbar style={{marginBottom:0}} inverse>
+        <Navbar style={{marginBottom: 0}} inverse>
           <Navbar.Header>
             <Navbar.Brand>
-              <a href="#">{this.state.title}</a>
+              <LinkContainer to="/">
+                <a href="/">{this.props.title}</a>
+              </LinkContainer>
             </Navbar.Brand>
             <Navbar.Toggle />
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav>
-              <NavItem eventKey={1} href="#">Spot Map</NavItem>
+              <LinkContainer to="/map">
+                <NavItem eventKey={1}>Spot Map</NavItem>
+              </LinkContainer>
+              <LinkContainer to="/spots">
+                <NavItem eventKey={2}>Spot List</NavItem>
+              </LinkContainer>
             </Nav>
             <Nav pullRight>
               {userComponent}
@@ -80,3 +88,15 @@ export default class App extends React.Component {
     );
   }
 }
+
+export default connect(
+  (state) => {
+    return {
+      user: state.app.user,
+      providers: state.app.providers,
+      title: state.app.title,
+      nowLoading: state.spots.nowLoading,
+      comments: state.comments
+    };
+  })
+(App);

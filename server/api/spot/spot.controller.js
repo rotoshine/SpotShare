@@ -9,37 +9,60 @@ const handleError = require('../../utils/handleError').handleError;
 const loggingError = (err) => {
   console.error(err);
 };
-exports.findAll = (req, res) => {
+
+const findSpots = (query) => {
+  return new Promise((resolve, reject) => {
+    return Spot
+      .find(query)
+      .populate('files', '_id')
+      .populate('createdBy', 'name provider')
+      .exec()
+      .then(resolve)
+      .catch(reject);
+  });
+
+};
+
+exports.find = (req, res) => {
+  let query = req.query;
+  query.isDisplay = true;
+
+  return findSpots(query)
+    .then((spots) => {
+      return res.json({spots: spots});
+    })
+    .catch((e) => {
+      return res.status(500).json({message: e.message});
+    });
+};
+exports.findWithCoordinates = (req, res) => {
   let queryParams = req.query;
   let x1 = queryParams.x1;
   let x2 = queryParams.x2;
   let y1 = queryParams.y1;
   let y2 = queryParams.y2;
 
-  return Spot
-    .find({
-      geo: {
-        $geoWithin: {
-          $box: [
-            [x1, y1], [x2, y2]
-          ]
-        }
-      },
-      isDisplay: true
-    })
-    .populate('files', '_id')
-    .populate('createdBy', 'name provider')
-    .exec((err, spots) => {
-      if (err) {
-        return res.status(500).json({
-          error: err.message
-        });
-      } else {
-        return res.json({
-          spots: spots
-        });
+  return findSpots({
+    geo: {
+      $geoWithin: {
+        $box: [
+          [x1, y1], [x2, y2]
+        ]
       }
+    },
+    isDisplay: true
+  })
+    .then((spots) => {
+      return res.json({
+        spots: spots
+      });
+    })
+    .catch((e) => {
+      return res.status(500).json({
+        message: e.message
+      });
     });
+
 };
 
 exports.findById = (req, res) => {

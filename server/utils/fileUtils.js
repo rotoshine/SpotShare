@@ -6,6 +6,13 @@ const Spot = mongoose.model('Spot');
 const SpotFile = mongoose.model('SpotFile');
 const config = require('../config');
 
+/**
+ * 임시폴더에 있는 파일을 특정 스팟 아래 파일로 이동시키는 함수.
+ * 코드의 간결함을 위해 동기방식으로 동작하므로 성능저하를 주의할 것.
+ * @param spotId
+ * @param uploadedMulterFile
+ * @returns {string}
+ */
 const moveTempToDestination = (spotId, uploadedMulterFile) => {
   const fileDestinationDirectory = path.normalize(`${config.fileUploadPath}/${spotId}`);
   const fileDestination = `${fileDestinationDirectory}/${uploadedMulterFile.filename}`;
@@ -17,7 +24,6 @@ const moveTempToDestination = (spotId, uploadedMulterFile) => {
 
   return fileDestination;
 };
-
 exports.moveTempToDestination = moveTempToDestination;
 
 const saveSpotFiles = (spotId, userId, uploadedMulterFiles) => {
@@ -34,8 +40,6 @@ const saveSpotFiles = (spotId, userId, uploadedMulterFiles) => {
           mimeType: uploadedFile.mimetype,
           createdBy: userId
         });
-
-        console.log(spotFile);
 
         spotFile
           .save()
@@ -68,14 +72,10 @@ const saveSpotFiles = (spotId, userId, uploadedMulterFiles) => {
 
     });
   });
-
 };
-
 exports.saveSpotFiles = saveSpotFiles;
 
-
 const streamFileToResponse = (res, filePath, mimeType) => {
-  console.log('check file path: ' + filePath);
   return fs.exists(filePath, (exists) => {
     if (exists) {
       if (mimeType) {
@@ -89,5 +89,4 @@ const streamFileToResponse = (res, filePath, mimeType) => {
     }
   });
 };
-
 exports.streamFileToResponse = streamFileToResponse;

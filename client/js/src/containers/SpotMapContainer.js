@@ -11,8 +11,6 @@ import * as SpotFileActionCreators from '../actions/SpotFileActionCreators';
 
 import {Well, Input, Button} from 'react-bootstrap';
 
-
-import App from '../App';
 import SimpleSpotList from '../components/SimpleSpotList';
 import SpotFormModal from '../components/SpotFormModal';
 import SpotDetailModal from '../components/SpotDetailModal';
@@ -20,6 +18,7 @@ import SpotDetailModal from '../components/SpotDetailModal';
 const CLUSTERER_LEVEL = 5;
 class SpotMapContainer extends React.Component {
   static propTypes = {
+    user: PropTypes.object.isRequired,
     nowLoading: PropTypes.bool.isRequired,
     spots: PropTypes.array.isRequired,
     spotForm: PropTypes.shape({
@@ -42,8 +41,7 @@ class SpotMapContainer extends React.Component {
       displaySpot: null
     },
     height: 0,
-    user: JSON.parse(document.getElementById('user').innerHTML),
-    useCurrentPosition: location.protocol === 'https:'
+    useCurrentPosition: window && window.location && window.location.protocol === 'https:'
   };
 
   constructor(props) {
@@ -56,8 +54,10 @@ class SpotMapContainer extends React.Component {
     this.spotFileActions = bindActionCreators(SpotFileActionCreators, dispatch);
 
     this.markers = [];
+  }
 
-    const mapConfig = JSON.parse(document.getElementById('mapConfig').innerHTML);
+  componentDidMount() {
+    const {mapConfig} = this.props;
 
     if (mapConfig && mapConfig.markerUrl) {
       this.markerImage = new daum.maps.MarkerImage(
@@ -75,11 +75,9 @@ class SpotMapContainer extends React.Component {
         }
       );
     }
-  }
 
-  componentDidMount() {
     this.setState({
-      height: $(window).height() - $('.navbar').height()
+      height: window ? $(window).height() - $('.navbar').height() : 1000
     }, () => {
       this.createMap();
       $('#spot-map').on('click', '.marker-info-window', (e) => {
@@ -112,7 +110,7 @@ class SpotMapContainer extends React.Component {
 
       this.markers = [];
 
-      this.fetchSpots();
+      this.fetchSpotsWithCoordinates();
       this.registMapEvents();
     });
   }
@@ -122,10 +120,10 @@ class SpotMapContainer extends React.Component {
       const {event} = daum.maps;
       const map = this.map;
       event.addListener(map, 'dragend', () => {
-        this.fetchSpots();
+        this.fetchSpotsWithCoordinates();
       });
       event.addListener(map, 'zoom_changed', () => {
-        this.fetchSpots();
+        this.fetchSpotsWithCoordinates();
       });
       event.addListener(map, 'dblclick', (mouseEvent) => {
         if (this.state.user.isLogin) {
@@ -143,18 +141,18 @@ class SpotMapContainer extends React.Component {
       .createOrUpdateSpot(spotForm)
       .then((spot) => {
         this.actions.resetSpotForm();
-        this.fetchSpots();
+        this.fetchSpotsWithCoordinates();
         this.handleModalClose();
         this.showSpotDetail(spot);
       });
   }
 
-  fetchSpots() {
+  fetchSpotsWithCoordinates() {
     const bounds = this.map.getBounds();
     const swLatLng = bounds.getSouthWest();
     const neLatLng = bounds.getNorthEast();
 
-    this.actions.fetchSpots(
+    this.actions.fetchSpotsWithCoordinates(
       neLatLng.getLat(),
       neLatLng.getLng(),
       swLatLng.getLat(),
@@ -226,7 +224,7 @@ class SpotMapContainer extends React.Component {
         displaySpot: spot
       }
     }, () => {
-      this.refs.spotDetailModal.renderRoadView();
+      this.spotDetailModal.renderRoadView();
     });
   }
 
@@ -281,7 +279,7 @@ class SpotMapContainer extends React.Component {
 
       try {
         // geolocation 사용이 가능한 경우
-        if ('geolocation' in navigator && this.state.useCurrentPosition) {
+        if (window && 'geolocation' in window.navigator && this.state.useCurrentPosition) {
           return navigator.geolocation.getCurrentPosition((position) => {
             if (_.isObject(position)) {
               const {latitude, longitude} = position.coords;
@@ -327,14 +325,14 @@ class SpotMapContainer extends React.Component {
   }
 
   render() {
-    const {formModal, detailDisplayModal, user} = this.state;
-    const {spots, spotForm, nowLoading} = this.props;
+    const {formModal, detailDisplayModal} = this.state;
+    const {user, spots, spotForm, nowLoading} = this.props;
 
     const {createComment, removeComment} = this.commentActions;
 
     return (
-      <App>
-        <SpotDetailModal ref="spotDetailModal"
+      <div>
+        <SpotDetailModal ref={(spotDetailModal) => { this.spotDetailModal = spotDetailModal; }}
                          visible={detailDisplayModal.visible}
                          spot={detailDisplayModal.displaySpot}
                          isLogin={user.isLogin}
@@ -366,7 +364,7 @@ class SpotMapContainer extends React.Component {
                             onMouseOut={this.handleMouseOut}/>
           </div>
         </div>
-      </App>
+      </div>
     );
   }
 
@@ -435,7 +433,7 @@ class SpotMapContainer extends React.Component {
 
     const removeAfterCallback = () => {
       this.handleModalClose();
-      this.fetchSpots();
+      this.fetchSpotsWithCoordinates();
     };
     if (user.isLogin) {
       if (user._id === spot.createdBy._id) {
@@ -463,6 +461,8 @@ class SpotMapContainer extends React.Component {
 export default connect(
   (state) => {
     return {
+      user: state.app.user,
+      mapConfig: state.app.mapConfig,
       spots: state.spots.spots,
       spotForm: state.spots.spotForm,
       nowLoading: state.spots.nowLoading,

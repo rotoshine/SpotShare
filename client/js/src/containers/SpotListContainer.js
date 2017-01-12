@@ -9,7 +9,7 @@ export default class SpotListStyleContainer extends React.Component {
     static propTypes = {};
     render () {
         return (
-            <div></div>
+            <div>리스트</div>
         );
     }
 }

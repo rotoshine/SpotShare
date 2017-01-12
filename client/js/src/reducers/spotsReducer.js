@@ -10,7 +10,7 @@ import {
 import _ from 'lodash';
 
 const initialSpotsState = {
-  nowLoading: false,
+  nowLoading: true,
   spots: [],
   spotForm: {
     _id: null,

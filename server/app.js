@@ -1,6 +1,7 @@
 'use strict';
 
 require('dotenv').config();
+const logger = require('./utils/logger');
 const config = require('./config');
 const glob = require('glob');
 const _ = require('lodash');
@@ -21,13 +22,11 @@ const webpackHotMiddleware = require('webpack-hot-middleware');
 const webpack = require('webpack');
 const webpackConfig = require('../webpack.config.js');
 const argv = require('minimist')(process.argv.slice(2));
-
-console.log(argv);
 const isDevMode = argv.mode !== 'production';
 
 // webpack setting
-if(isDevMode){
-  console.log('Development Mode Run.');
+if (isDevMode) {
+  logger.info('Development Mode Run.');
   const compiler = webpack(webpackConfig);
   app.use(webpackMiddleware(compiler, {
     publicPath: webpackConfig.output.publicPath,
@@ -37,15 +36,15 @@ if(isDevMode){
   }));
 
   app.use(webpackHotMiddleware(compiler, {
-    log: console.log
+    log: logger.info
   }));
-}else{
-  console.log('Production Mode Run.');
+} else {
+  logger.info('Production Mode Run.');
 }
 
 // middleware loading
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 // mongoose connect
@@ -54,40 +53,40 @@ const mongooseConnection = mongoose.connect(config.mongo);
 app.use(session({
   secret: config.sessionSecret || 'roto_is_good_programmer',
   store: new MongoStore({
-    mongooseConnection: mongoose.connection,
-
-  })
+    mongooseConnection: mongoose.connection
+  }),
+  resave: true,
+  saveUninitialized: true
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
 
-
 // model loading
 const modelPaths = glob.sync(`${__dirname}/**/*.model.js`);
 
-if(_.isArray(modelPaths)){
+if (_.isArray(modelPaths)) {
   autoIncrement.initialize(mongooseConnection);
-  console.log('model loading start..');
+  logger.info('model loading start..');
   modelPaths.forEach((modelPath) => {
     require(modelPath)(mongoose, {
       autoIncrement: autoIncrement
     });
 
-    console.log(`${modelPath} model loaded.`);
+    logger.info(`${modelPath} model loaded.`);
   });
-  console.log('model loading done.');
+  logger.info('model loading done.');
 }
 
 // api loading
 const apiPaths = glob.sync(`${__dirname}/api/**/index.js`);
-if(_.isArray(apiPaths)){
-  console.log('api loading start..');
+if (_.isArray(apiPaths)) {
+  logger.info('api loading start..');
   apiPaths.forEach((apiPath) => {
     app.use('/api', require(apiPath));
-    console.log(`${apiPath} api loaded.`);
+    logger.info(`${apiPath} api loaded.`);
   });
-  console.log('api loading done.');
+  logger.info('api loading done.');
 }
 
 // auth config
@@ -98,15 +97,29 @@ const CLIENT_PATH = path.resolve(`${__dirname}`, '../client');
 app.use(express.static(CLIENT_PATH));
 
 // view engine
-app.engine('handlebars', exphbs());
+app.engine('.hbs', exphbs({
+  extname: '.hbs'
+}));
 app.set('views', `${__dirname}/views`);
-app.set('view engine', 'handlebars');
+app.set('view engine', '.hbs');
 
-app.get('', (req, res) => {
+app.use(handleRender);
+
+import React from 'react';
+import {renderToString} from 'react-dom/server';
+import {createStore} from 'redux';
+import {Provider} from 'react-redux';
+import reducers from '../client/js/src/reducers';
+
+import {match, RouterContext} from 'react-router';
+import routes from '../client/js/src/routes';
+
+function handleRender(req, res) {
   let user = {
     isLogin: false
   };
-  if(req.user){
+
+  if (req.user) {
     user = {
       _id: req.user._id,
       isLogin: true,
@@ -115,17 +128,50 @@ app.get('', (req, res) => {
     }
   }
 
-  return res.render('index', {
-    title: config.title,
-    fireBase: config.fireBase,
-    mapApiKey: config.map.apiKey,
-    googleAnalyticsKey: config.googleAnalyticsKey || '',
-    map: JSON.stringify(config.map),
-    user: JSON.stringify(user),
-    providers: JSON.stringify(_.keys(config.auth))
+  let preloadedState = {
+    app: {
+      user: user,
+      providers: _.keys(config.auth),
+      title: config.title,
+      mapConfig: config.map
+    }
+  };
+
+  const store = createStore(reducers, preloadedState);
+
+  // avoid window object undefined error
+  global.window = {};
+
+  match({routes, location: req.url}, (error, redirectLocation, renderProps) => {
+    if (error) {
+      return res.status(500).send(error.message);
+    } else if (redirectLocation) {
+      res.redirect(302, redirectLocation.pathname + redirectLocation.search);
+    } else if(renderProps){
+      const html = renderToString(
+        <Provider store={store}>
+          <RouterContext {...renderProps} />
+        </Provider>
+      );
+
+      const finalState = store.getState();
+
+      console.log(html);
+
+      return res.render('index', {
+        html: html,
+        preloadedState: JSON.stringify(finalState),
+        fireBase: config.fireBase,
+        mapApiKey: config.map.apiKey,
+        googleAnalyticsKey: config.googleAnalyticsKey || '',
+        meta: config.meta
+      });
+    }else{
+      res.status(404).send('not found')
+    }
   });
-});
+}
 
 app.listen(process.env.PORT);
 
-console.log(`server run. port : ${process.env.PORT}`);
+logger.info(`server run. port : ${process.env.PORT}`);

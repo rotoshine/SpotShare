@@ -2,7 +2,7 @@ import * as Actions from './spotsActions';
 
 import axios from 'axios';
 
-export function fetchSpots(x1, y1, x2, y2) {
+export function fetchSpotsWithCoordinates(x1, y1, x2, y2) {
   return (dispatch) => {
     dispatch({
       type: Actions.REQUEST_SPOTS
@@ -10,13 +10,31 @@ export function fetchSpots(x1, y1, x2, y2) {
 
     const querystring = `x1=${x1}&y1=${y1}&x2=${x2}&y2=${y2}`;
 
-    return axios.get(`/api/spots?${querystring}`)
-      .then((response) => {
+    return axios.get(`/api/spots/with-coordinates?${querystring}`)
+      .then((res) => {
         dispatch({
           type: Actions.RECEIVE_SPOTS,
-          spots: response.data.spots
+          spots: res.data.spots
         });
       })
+  };
+}
+
+export function fetchSpots(query) {
+  let querystrings = [];
+  for(let key in query){
+    querystrings.push(`${key}=${query[key]}`);
+  }
+  const querystring = querystrings.join('&');
+
+  return (dispatch) => {
+    return axios.get(`/api/spots?${querystring}`)
+      .then((res) => {
+        dispatch({
+          type: Actions.RECEIVE_SPOTS,
+          spots: res.data.spots
+        })
+      });
   };
 }
 
