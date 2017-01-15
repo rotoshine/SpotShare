@@ -1,28 +1,32 @@
 'use strict';
 
 require('dotenv').config();
-const logger = require('./utils/logger');
-const config = require('./config');
-const glob = require('glob');
-const _ = require('lodash');
-const express = require('express');
-const mongoose = require('mongoose');
+import logger from './utils/logger';
+import config from './config';
+import glob from 'glob';
+import _ from 'lodash';
+import express from 'express';
+import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
-const autoIncrement = require('mongoose-auto-increment');
-const path = require('path');
-const exphbs = require('express-handlebars');
-const passport = require('passport');
-const app = express();
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const webpackMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-hot-middleware');
-const webpack = require('webpack');
-const webpackConfig = require('../webpack.config.js');
-const argv = require('minimist')(process.argv.slice(2));
+import autoIncrement from 'mongoose-auto-increment';
+import path from 'path';
+import exphbs from 'express-handlebars';
+import passport from 'passport';
+import session from 'express-session';
+import connectMongo from 'connect-mongo';
+const MongoStore = connectMongo(session);
+
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import webpackMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
+import webpack from 'webpack';
+import webpackConfig from '../webpack.config.js';
+import minimist from 'minimist';
+const argv = minimist(process.argv.slice(2));
 const isDevMode = argv.mode !== 'production';
+
+const app = express();
 
 // webpack setting
 if (isDevMode) {
@@ -89,6 +93,16 @@ if (_.isArray(apiPaths)) {
   logger.info('api loading done.');
 }
 
+// web controller loading
+const webControllerPaths = glob.sync(`${__dirname}/webController/**/*.js`);
+if( _.isArray(webControllerPaths)){
+  logger.info('web controller loading start..');
+  webControllerPaths.forEach((webControllerPath) => {
+    require(webControllerPath)(app);
+  });
+  logger.info('web controller loading done.');
+}
+
 // auth config
 require('./auth/passport')(app, passport, config);
 
@@ -98,79 +112,14 @@ app.use(express.static(CLIENT_PATH));
 
 // view engine
 app.engine('.hbs', exphbs({
+  partialsDir: `${__dirname}/views/partials`,
   extname: '.hbs'
 }));
 app.set('views', `${__dirname}/views`);
 app.set('view engine', '.hbs');
 
-app.use(handleRender);
-
-import React from 'react';
-import {renderToString} from 'react-dom/server';
-import {createStore} from 'redux';
-import {Provider} from 'react-redux';
-import reducers from '../client/js/src/reducers';
-
-import {match, RouterContext} from 'react-router';
-import routes from '../client/js/src/routes';
-
-function handleRender(req, res) {
-  let user = {
-    isLogin: false
-  };
-
-  if (req.user) {
-    user = {
-      _id: req.user._id,
-      isLogin: true,
-      name: req.user.name,
-      provider: req.user.provider
-    }
-  }
-
-  let preloadedState = {
-    app: {
-      user: user,
-      providers: _.keys(config.auth),
-      title: config.title,
-      mapConfig: config.map
-    }
-  };
-
-  const store = createStore(reducers, preloadedState);
-
-  // avoid window object undefined error
-  global.window = {};
-
-  match({routes, location: req.url}, (error, redirectLocation, renderProps) => {
-    if (error) {
-      return res.status(500).send(error.message);
-    } else if (redirectLocation) {
-      res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-    } else if(renderProps){
-      const html = renderToString(
-        <Provider store={store}>
-          <RouterContext {...renderProps} />
-        </Provider>
-      );
-
-      const finalState = store.getState();
-
-      console.log(html);
-
-      return res.render('index', {
-        html: html,
-        preloadedState: JSON.stringify(finalState),
-        fireBase: config.fireBase,
-        mapApiKey: config.map.apiKey,
-        googleAnalyticsKey: config.googleAnalyticsKey || '',
-        meta: config.meta
-      });
-    }else{
-      res.status(404).send('not found')
-    }
-  });
-}
+// react-redux server side rendering
+app.use(require('./utils/reactRenderer').default);
 
 app.listen(process.env.PORT);
 

@@ -1,0 +1,13 @@
+<script src="https://www.gstatic.com/firebasejs/3.6.3/firebase.js"></script>
+<script>
+    // Initialize Firebase
+    var config = {
+        apiKey: "{{fireBase.apiKey}}",
+        authDomain: "{{fireBase.authDomain}}",
+        databaseURL: "{{fireBase.databaseURL}}",
+        storageBucket: "{{fireBase.storageBucket}}",
+        messagingSenderId: "{{fireBase.messagingSenderId}}"
+    };
+
+    firebase.initializeApp(config);
+</script>

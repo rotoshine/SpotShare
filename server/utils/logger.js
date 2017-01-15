@@ -1,8 +1,10 @@
-const winston = require('winston');
+import winston from 'winston';
 
 const logger = new (winston.Logger)({
   transports: [
-    new (winston.transports.Console)(),
+    new (winston.transports.Console)({
+      colorize: true
+    }),
     new (winston.transports.File)({
       name: 'info-file',
       filename: 'spot-share.log',
@@ -16,4 +18,4 @@ const logger = new (winston.Logger)({
   ]
 });
 
-module.exports = logger;
+export default logger;

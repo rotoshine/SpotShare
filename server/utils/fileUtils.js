@@ -90,3 +90,9 @@ const streamFileToResponse = (res, filePath, mimeType) => {
   });
 };
 exports.streamFileToResponse = streamFileToResponse;
+
+const getImageUrl = (fileId) => {
+  return `${config.url}/files/${fileId}`;
+};
+
+exports.getImageUrl = getImageUrl;

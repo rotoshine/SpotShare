@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const logger = require('./server/utils/logger').default;
 const argv = require('minimist')(process.argv.slice(2));
 const path = require('path');
 const webpack = require('webpack');
@@ -22,11 +23,12 @@ if(argv.mode !== 'production'){
     new webpack.HotModuleReplacementPlugin(),
     new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /ko/),
   ];
-  console.log('Webpack hot loader enable.');
+  logger.info('Webpack hot loader enable.');
 }else{
   devtool = 'source-map';
   plugins = [
     new webpack.optimize.UglifyJsPlugin(),
+    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.DedupePlugin(),
     new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /ko/),
     new webpack.DefinePlugin({

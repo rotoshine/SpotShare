@@ -12,6 +12,7 @@ import _ from 'lodash';
 const initialSpotsState = {
   nowLoading: true,
   spots: [],
+  loadedSpot: null,
   spotForm: {
     _id: null,
     spotName: '',

@@ -11,6 +11,12 @@ export default {
     },
     {
       path: '/spots/:spotId', component: require('./containers/SpotDetailContainer').default
+    },
+    {
+      path: '/spots/:spotId/edit', component: require('./containers/SpotFormContainer').default
+    },
+    {
+      path: '/*', component: require('./containers/errors/NotFoundContainer').default
     }
   ]
 };

@@ -1,11 +1,10 @@
 'use strict';
-const FacebookStrategy = require('passport-facebook').Strategy;
-const KakaoStrategy = require('passport-kakao').Strategy;
-const TwitterStrategy = require('passport-twitter').Strategy;
+import logger from '../utils/logger';
+import {Strategy as FacebookStrategy} from 'passport-facebook';
+import {Strategy as KakaoStrategy} from 'passport-kakao';
+import {Strategy as TwitterStrategy} from'passport-twitter';
 
-const FB = require('fb');
-
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const User = mongoose.model('User');
 
 function oauthConnect(provider, profile, done) {
@@ -98,7 +97,7 @@ module.exports = (app, passport, config) => {
         successRedirect: '/'
       }));
 
-      console.log(`[AUTH] ${providerName} enable.`);
+      logger.info(`[AUTH] ${providerName} enable.`);
     }
   }
 

@@ -20,7 +20,6 @@ const findSpots = (query) => {
       .then(resolve)
       .catch(reject);
   });
-
 };
 
 exports.find = (req, res) => {
