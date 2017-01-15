@@ -5,7 +5,7 @@
   "scripts": {
     "nodemon": "nodemon --exec babel-node server/app.js --mode development",
     "start-dev": "babel-node server/app.js --mode development",
-    "start": "webpack --mode production && babel-node server/app.js --mode production",
+    "start": "babel-node node_modules/webpack/bin/webpack.js --mode production && babel-node server/app.js --mode production",
     "lint": "eslint src",
     "prenodemon": "npm install",
     "preinstall": "npm prune",
