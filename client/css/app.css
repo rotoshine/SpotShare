@@ -156,7 +156,7 @@ html, body, .root {
   color: #FFFFFF;
 }
 
-/* spot detail modal */
+/* spot detail */
 .spot-detail-contents-container{
   display: flex;
   flex-direction:row;
@@ -166,6 +166,10 @@ html, body, .root {
   width: 50%;
   height: 300px;
   border: 1px solid #ccc;
+}
+
+.spot-detail-container .spot-detail-media {
+  height: 500px;
 }
 
 .spot-detail-contents-container .spot-detail-media .road-view{

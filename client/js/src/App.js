@@ -9,8 +9,9 @@ import {LinkContainer} from 'react-router-bootstrap';
 class App extends React.Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
     providers: PropTypes.array.isRequired,
-    title: PropTypes.string.isRequired,
+    defaultTitle: PropTypes.string.isRequired,
     children: PropTypes.oneOfType([PropTypes.element, PropTypes.array])
   };
 
@@ -63,7 +64,7 @@ class App extends React.Component {
           <Navbar.Header>
             <Navbar.Brand>
               <LinkContainer to="/">
-                <a href="/">{this.props.title}</a>
+                <a href="/">{this.props.defaultTitle}</a>
               </LinkContainer>
             </Navbar.Brand>
             <Navbar.Toggle />
@@ -73,7 +74,7 @@ class App extends React.Component {
               <LinkContainer to="/map">
                 <NavItem eventKey={1}>Spot Map</NavItem>
               </LinkContainer>
-              <LinkContainer to="/spots">
+              <LinkContainer to="/spots" onClick={this.handleSpotListMenuClick}>
                 <NavItem eventKey={2}>Spot List</NavItem>
               </LinkContainer>
             </Nav>
@@ -87,6 +88,17 @@ class App extends React.Component {
       </section>
     );
   }
+
+  handleSpotListMenuClick = (e) => {
+    const {dispatch, location} = this.props;
+    if(location.pathname !== '/spots'){
+      dispatch({
+        type: 'RESET_LOADED_SPOTS'
+      });
+    }else{
+      e.preventDefault();
+    }
+  };
 }
 
 export default connect(
@@ -94,9 +106,7 @@ export default connect(
     return {
       user: state.app.user,
       providers: state.app.providers,
-      title: state.app.title,
-      nowLoading: state.spots.nowLoading,
-      comments: state.comments
+      defaultTitle: state.app.defaultTitle
     };
   })
 (App);

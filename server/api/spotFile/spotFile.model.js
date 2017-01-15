@@ -10,10 +10,6 @@ module.exports = (mongoose, plugins) => {
       ref: 'Spot',
       required: true
     },
-    originalFileName: {
-      type: String,
-      required: true
-    },
     filePath: {
       type: String,
       required: true
@@ -21,6 +17,9 @@ module.exports = (mongoose, plugins) => {
     mimeType: {
       type: String,
       required: true
+    },
+    size: {
+      type: Number
     },
     createdAt: {
       type: Date,

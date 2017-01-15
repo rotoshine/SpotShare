@@ -1,33 +1,20 @@
 import {
   FETCH_SPOTS,
-  REQUEST_SPOTS,
   RECEIVE_SPOTS,
-  CREATE_SPOT,
-  SET_SPOT_FORM,
-  UPDATE_SPOT_FORM,
-  RESET_SPOT_FORM
+  RESET_LOADED_SPOTS,
+  CREATE_SPOT
 } from '../actions/spotsActions';
 import _ from 'lodash';
 
 const initialSpotsState = {
   nowLoading: true,
-  spots: [],
-  loadedSpot: null,
-  spotForm: {
-    _id: null,
-    spotName: '',
-    description: '',
-    address: '',
-    geo: [],
-    files: []
-  },
-  height: 0
+  spots: null,
+  totalCount: 0
 };
 
 function spots(state = initialSpotsState, action) {
   switch (action.type) {
     case FETCH_SPOTS:
-    case REQUEST_SPOTS:
       return _.assign({}, state, {
         nowLoading: true
       });
@@ -36,40 +23,15 @@ function spots(state = initialSpotsState, action) {
         nowLoading: false,
         spots: action.spots
       });
+    case RESET_LOADED_SPOTS:
+      return _.assign({}, state, {
+        spots: null
+      });
     case CREATE_SPOT:
       let nextSpots = _.cloneDeep(state.spots);
       nextSpots.push(action.spot);
       return _.assign({}, state, {
         spots: _.concat(state.spots, action.spot)
-      });
-    case SET_SPOT_FORM:
-      return _.assign({}, state, {
-        spotForm: {
-          _id: action.spotForm._id,
-          spotName: action.spotForm.spotName,
-          description: action.spotForm.description,
-          address: action.spotForm.address,
-          geo: action.spotForm.geo,
-          files: action.spotForm.files
-        }
-      });
-    case UPDATE_SPOT_FORM:
-      let spotForm = _.cloneDeep(state.spotForm);
-      spotForm[action.field] = action.value;
-
-      return _.assign({}, state, {
-        spotForm: spotForm
-      });
-    case RESET_SPOT_FORM:
-      return _.assign({}, state, {
-        spotForm: {
-          _id: null,
-          spotName: '',
-          description: '',
-          address: '',
-          geo: [],
-          files: []
-        }
       });
     default:
       return state;

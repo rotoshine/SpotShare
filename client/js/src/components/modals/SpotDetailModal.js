@@ -1,15 +1,16 @@
 import React, {PropTypes} from 'react';
-import _ from 'lodash';
 
 import {Modal} from 'react-bootstrap';
 
-import SpotDetail from './detail/SpotDetail';
+import SpotDetail from '../detail/SpotDetail';
+import CommentBox from '../comments/CommentBox';
 
 export default class SpotDetailModal extends React.Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
     spot: PropTypes.object,
-    isLogin: PropTypes.bool.isRequired,
+    user: PropTypes.object.isRequired,
+    nowCommentLoading: PropTypes.bool.isRequired,
     comments: PropTypes.array,
     onRemove: PropTypes.func.isRequired,
     onAddComment: PropTypes.func.isRequired,
@@ -25,7 +26,7 @@ export default class SpotDetailModal extends React.Component {
 
   render() {
     const {
-      spot, visible, isLogin, comments,
+      user, spot, visible, nowCommentLoading, comments,
       onRemove, onClose, onAddComment, onRemoveComment, onModifyClick
     } = this.props;
 
@@ -41,13 +42,20 @@ export default class SpotDetailModal extends React.Component {
         <Modal.Body>
           <SpotDetail ref={(spotDetail) => { this.spotDetail = spotDetail; }}
                       spot={spot}
-                      isLogin={isLogin}
+                      user={user}
                       comments={comments}
                       onRemove={onRemove}
-                      onAddComment={onAddComment}
-                      onRemoveComment={onRemoveComment}
                       onModifyClick={onModifyClick}/>
+          <CommentBox user={user}
+                      spotId={spot._id}
+                      nowLoading={nowCommentLoading}
+                      comments={comments}
+                      onAddComment={onAddComment}
+                      onRemoveComment={onRemoveComment}/>
         </Modal.Body>
+        <Modal.Footer>
+          test
+        </Modal.Footer>
       </Modal>
     );
   }

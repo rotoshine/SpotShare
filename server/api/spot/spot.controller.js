@@ -14,6 +14,9 @@ const findSpots = (query) => {
   return new Promise((resolve, reject) => {
     return Spot
       .find(query)
+      .sort({
+        _id: -1
+      })
       .populate('files', '_id')
       .populate('createdBy', 'name provider')
       .exec()

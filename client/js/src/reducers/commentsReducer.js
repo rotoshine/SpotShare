@@ -1,14 +1,23 @@
 import _ from 'lodash';
 import * as CommentAction from '../actions/commentActions';
 
-function comments(state = [], action) {
+const initialState = {
+  nowLoading: false,
+  comments: []
+};
+function comments(state = initialState, action) {
   switch (action.type) {
     case CommentAction.RESET_COMMENTS:
-      return _.assign([]);
+      return _.assign({}, initialState);
     case CommentAction.FETCH_COMMENTS:
-    case CommentAction.REQUEST_COMMENTS:
+      return _.assign({
+        nowLoading: true
+      });
     case CommentAction.RECIEVE_COMMENTS:
-      return _.assign([], state, action.comments);
+      return _.assign([], state, {
+        nowLoading: false,
+        comments: action.comments
+      });
     case CommentAction.CREATE_COMMENT:
     default:
       return state;

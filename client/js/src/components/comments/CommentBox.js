@@ -2,14 +2,14 @@ import React, {PropTypes} from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 
-import {Button} from 'react-bootstrap';
 
 import Comment from './Comment';
 
 export default class CommentBox extends React.Component {
   static propTypes = {
-    spotId: PropTypes.number,
-    isLogin: PropTypes.bool.isRequired,
+    spotId: PropTypes.number.isRequired,
+    user: PropTypes.object.isRequired,
+    nowLoading: PropTypes.bool.isRequired,
     comments: PropTypes.array,
     onAddComment: PropTypes.func.isRequired,
     onRemoveComment: PropTypes.func.isRequired
@@ -21,12 +21,16 @@ export default class CommentBox extends React.Component {
   }
 
   renderComments() {
-    const {comments} = this.props;
+    const {nowLoading, comments} = this.props;
     let commentsComponent = [];
+    if(nowLoading){
+      return null;
+    }
+
     if (_.isArray(comments) && comments.length > 0) {
       comments.forEach((comment, i) => {
         commentsComponent.push(
-          <Comment key={i} comment={comment} />
+          <Comment key={i} comment={comment}/>
         );
       });
     } else {
@@ -37,35 +41,39 @@ export default class CommentBox extends React.Component {
 
     return commentsComponent;
   }
+
   render() {
-    const {comments, isLogin} = this.props;
+    const {nowLoading, comments, user} = this.props;
+    const {isLogin} = user;
     let commentsComponent = [];
-    if (_.isArray(comments) && comments.length > 0) {
+
+    if (_.isArray(comments)) {
       comments.forEach((comment, i) => {
         commentsComponent.push(
-          <Comment key={i} comment={comment} />
+          <Comment key={i} comment={comment}/>
         );
       });
-    } else {
-      commentsComponent.push(
-        <div key="empty" className="text-center">아직 이 장소에 대한 댓글이 없습니다.</div>
-      );
     }
-
     let commentForm = null;
-    if(isLogin){
+    if (isLogin) {
       commentForm = (
         <form onSubmit={this.handleCreateCommentSubmit}>
-          <div className="col-xs-11">
+          <div className="col-xs-3">
+            <span className="label label-info">
+              <i className={`fa fa-${user.provider}`}/> {user.name}
+            </span>
+          </div>
+          <div className="col-xs-8">
             <input id="comment"
                    type="text"
                    className="form-control"
-                   placeholder="이 장소에 대한 생각을 입력해주세요." />
+                   autoComplete="off"
+                   placeholder="이 장소에 대한 생각을 입력해주세요."/>
           </div>
           <div className="col-xs-1">
             <div className="pull-right btn-group-sm">
               <button type="submit" className="btn btn-primary btn-fab">
-                <i className="fa fa-2x fa-comment" style={{marginLeft:-12}}/>
+                <i className="fa fa-2x fa-comment" style={{marginLeft: -12}}/>
               </button>
             </div>
           </div>
@@ -76,12 +84,18 @@ export default class CommentBox extends React.Component {
     return (
       <div className="row">
         <div className="col-xs-12">
-          {commentForm}
+          <div className="row">
+            {commentForm}
+          </div>
         </div>
         <div className="col-xs-12">
-          <div style={{paddingLeft: 20}}>
-            {this.renderComments()}
-          </div>
+          {
+            nowLoading &&
+            <div className="text-center">
+              <img src="/images/loading.svg" alt=""/>
+            </div>
+          }
+          {this.renderComments()}
         </div>
       </div>
     )

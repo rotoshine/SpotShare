@@ -1,12 +1,12 @@
-import _ from 'lodash';
 import mongoose from 'mongoose';
 const Spot = mongoose.model('Spot');
 
 module.exports = (app) => {
   app.get('/spots', (req, res, next) => {
-    let query = _.assign({}, { isDisplay: true }, req.query);
+    //let query = _.assign({}, { isDisplay: true }, req.query);
+    let query = { isDisplay: true };
     let sort = {
-      createdAt: -1
+      _id: -1
     };
 
     return Spot
@@ -19,7 +19,18 @@ module.exports = (app) => {
       .exec()
       .then((spots) => {
         req.preloadedState = {
-          spots: spots
+          spots: {
+            nowLoading: false,
+            spots: spots,
+            spotForm: {
+              _id: null,
+              spotName: '',
+              description: '',
+              address: '',
+              geo: [],
+              files: []
+            }
+          }
         };
         next();
       })

@@ -1,13 +1,12 @@
-const _ = require('lodash');
-const mongoose = require('mongoose');
-const async = require('async');
-const fs = require('fs');
-const path = require('path');
-const config = require('../../config');
+import _ from 'lodash';
+import mongoose from 'mongoose';
+import config from '../../config';
+import fileUtils from '../../utils/fileUtils';
+
 const Spot = mongoose.model('Spot');
 const SpotFile = mongoose.model('SpotFile');
 
-const fileUtils = require('../../utils/fileUtils');
+
 
 const handleSpotFilesSave = (res, spotId, userId, uploadedMulterFiles) => {
   if(!res){
@@ -23,6 +22,7 @@ const handleSpotFilesSave = (res, spotId, userId, uploadedMulterFiles) => {
     .saveSpotFiles(spotId, userId, uploadedMulterFiles)
     .then((spotFileIds) => {
       let spotFiles = [];
+      // id 배열을 오브젝트 형태로 만듦
       spotFileIds.forEach((spotFileId) => {
         spotFiles.push({
           _id: spotFileId
@@ -44,9 +44,13 @@ exports.tempFilesMoveToSpot = (req, res) => {
 
 exports.uploadToSpot = (req, res) => {
   const spotId = req.params.spotId;
-  const uploadedFiles = req.files;
-
-  return handleSpotFilesSave(res, spotId, req.user._id, uploadedFiles);
+  fileUtils.upload(req, res)
+    .then((files) => {
+      return handleSpotFilesSave(res, spotId, req.user._id, files);
+    })
+    .catch((err) => {
+      return res.status(500).send(err);
+    });
 };
 
 exports.findTempFile = (req, res) => {
@@ -55,7 +59,20 @@ exports.findTempFile = (req, res) => {
 };
 
 exports.uploadFileTemp = (req, res) => {
-  return res.json(req.files);
+  fileUtils.upload(req, res)
+    .then((files) => {
+      let uploadedFileNames = _.map(files, (file) => {
+        return {
+          filename: file.filename,
+          mimetype: file.mimetype,
+          size: file.size
+        };
+      });
+      return res.json(uploadedFileNames);
+    })
+    .catch((err) => {
+      return res.status(500).send(err);
+    });
 };
 
 exports.findFile = (req, res) => {

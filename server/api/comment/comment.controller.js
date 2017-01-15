@@ -13,7 +13,7 @@ exports.findBySpotId = (req, res) => {
     })
     .populate('createdBy', 'name provider')
     .sort({
-      createdAt: -1
+      _id: -1
     })
     .exec((err, comments) => {
       handleError(err, res, () => {

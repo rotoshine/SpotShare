@@ -24,8 +24,11 @@ export default class Comment extends React.Component {
         <div className="col-xs-6">
           {comment.content}
         </div>
-        <div className="col-xs-3">
+        <div className="col-xs-2">
           {moment(comment.createdAt).fromNow()}
+        </div>
+        <div className="col-xs-1">
+
         </div>
       </div>
     )

@@ -8,6 +8,7 @@ import {connect} from 'react-redux';
  */
 class SpotFormContainer extends React.Component {
     static propTypes = {
+      spotForm: PropTypes.object,
       dispatch: PropTypes.func.isRequired
     };
     render () {
@@ -21,5 +22,6 @@ class SpotFormContainer extends React.Component {
 
 export default connect((state) => {
   return {
+    spotForm: state.spotForm
   };
 })(SpotFormContainer)

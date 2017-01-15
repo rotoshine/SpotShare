@@ -15,8 +15,6 @@ export default class SpotDetail extends React.Component {
     isLogin: PropTypes.bool.isRequired,
     comments: PropTypes.array.isRequired,
     onRemove: PropTypes.func.isRequired,
-    onAddComment: PropTypes.func.isRequired,
-    onRemoveComment: PropTypes.func.isRequired,
     onModifyClick: PropTypes.func.isRequired
   };
 
@@ -28,7 +26,7 @@ export default class SpotDetail extends React.Component {
   renderRoadView() {
     const {spot} = this.props;
 
-    if (_.isObject(spot)) {
+    if (!_.isNil(spot)) {
       this.setState({
         visibleRoadView: true,
         visibleImageIndex: -1
@@ -98,8 +96,8 @@ export default class SpotDetail extends React.Component {
     const {visibleRoadView, visibleImageIndex} = this.state;
 
     const {
-      spot, isLogin, comments,
-      onRemove, onAddComment, onRemoveComment, onModifyClick
+      spot,
+      onRemove, onModifyClick
     } = this.props;
     const {createdBy} = spot;
 
@@ -169,12 +167,6 @@ export default class SpotDetail extends React.Component {
             </div>
           </div>
         </div>
-        <hr/>
-        <CommentBox spotId={spot._id}
-                    isLogin={isLogin}
-                    comments={comments}
-                    onAddComment={onAddComment}
-                    onRemoveComment={onRemoveComment}/>
       </div>
     );
   }

@@ -9,7 +9,7 @@ export function fetchComments(spotId){
     });
 
     dispatch({
-      type: CommentAction.REQUEST_COMMENTS
+      type: CommentAction.FETCH_COMMENTS
     });
 
     return axios.get(`/api/spots/${spotId}/comments`)

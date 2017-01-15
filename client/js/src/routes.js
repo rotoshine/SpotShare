@@ -7,13 +7,17 @@ export default {
       path: '/map', component: require('./containers/SpotMapContainer').default
     },
     {
-      path: '/spots', component: require('./containers/SpotListContainer').default
+      path: '/spots',
+      component: require('./containers/SpotListContainer').default,
+      onLeave: () => {
+        console.log('leave..');
+      }
     },
     {
       path: '/spots/:spotId', component: require('./containers/SpotDetailContainer').default
     },
     {
-      path: '/spots/:spotId/edit', component: require('./containers/SpotFormContainer').default
+      path: '/spots/:spotId/form', component: require('./containers/SpotFormContainer').default
     },
     {
       path: '/*', component: require('./containers/errors/NotFoundContainer').default

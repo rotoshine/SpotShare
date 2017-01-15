@@ -1,6 +1,6 @@
 import * as Actions from './spotFileActions';
 import * as SpotActions from './spotsActions';
-
+import _ from 'lodash';
 import axios from 'axios';
 
 export function upload(spotId, files){
@@ -12,7 +12,7 @@ export function upload(spotId, files){
     return new Promise((resolve, reject) => {
       let uploadAPIUrl = '/api/files/upload';
 
-      if(spotId){
+      if(!_.isNil(spotId)){
         uploadAPIUrl = `/api/spots/${spotId}/files`;
       }
 
@@ -36,7 +36,7 @@ export function upload(spotId, files){
             type: Actions.UPLOAD_COMPLETE
           });
 
-          let {spotForm} = getState().spots;
+          let {spotForm} = getState();
 
           spotForm.files = spotForm.files.concat(uploadedFiles);
 

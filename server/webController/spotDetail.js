@@ -11,15 +11,22 @@ module.exports = (app) => {
     Spot
       .findById(spotId)
       .populate('createdBy', 'name provider')
+      .populate('files', '_id')
       .exec()
       .then((spot) => {
+        const title = `${config.title} - ${spot.spotName}`;
+        req.title = title;
         req.preloadedState = {
-          spots: {
+          spot: {
+            nowLoading: false,
             loadedSpot: spot
+          },
+          comments: {
+            comments: [],
+            nowLoading: true
           }
         };
 
-        const title = `${config.title} ${spot.spotName}`;
         let description = spot.description;
         if (description.length > 100) {
           description = description.substring(0, 100) + '..';
@@ -28,7 +35,7 @@ module.exports = (app) => {
         let imageUrl = config.meta.imageUrl;
 
         if (_.isArray(spot.files) && spot.files.length > 0) {
-          imageUrl = fileUtils.getImageUrl(spot.files[0])
+          imageUrl = fileUtils.getImageUrl(spot.files[0]._id);
         }
 
         req.meta = {

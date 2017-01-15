@@ -30,7 +30,8 @@ export default function handleRender(req, res) {
     app: {
       user: user,
       providers: _.keys(config.auth),
-      title: config.title,
+      defaultTitle: config.title,
+      title: req.title ? req.title : config.title,
       mapConfig: config.map
     }
   });

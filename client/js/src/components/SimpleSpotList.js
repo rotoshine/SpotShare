@@ -1,8 +1,8 @@
 import React, {PropTypes} from 'react';
 import _ from 'lodash';
 
-import {Button, Well} from 'react-bootstrap';
-
+import {Well} from 'react-bootstrap';
+import Loading from './commons/Loading';
 export default class SimpleSpotList extends React.Component {
   static propTypes = {
     nowLoading: PropTypes.bool.isRequired,
@@ -17,7 +17,9 @@ export default class SimpleSpotList extends React.Component {
 
     if(nowLoading){
       return (
-        <Well>로딩 중입니다...</Well>
+        <div className="text-center">
+          <Loading visible={true} />
+        </div>
       );
     }
     let spotListComponents = [];
@@ -34,7 +36,9 @@ export default class SimpleSpotList extends React.Component {
         );
       }else{
         spotListComponents.push(
-          <li key="summary"><div className="well well-sm">총 {spots.length} 개의 Spot</div></li>
+          <li key="summary">
+            <Well bsStyle="sm">총 {spots.length} 개의 Spot</Well>
+          </li>
         );
       }
 

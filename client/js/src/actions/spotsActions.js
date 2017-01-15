@@ -1,6 +1,6 @@
 export const FETCH_SPOTS = 'FETCH_SPOTS';
-export const REQUEST_SPOTS = 'REQUEST_SPOTS';
 export const RECEIVE_SPOTS = 'RECEIVE_SPOTS';
+export const RESET_LOADED_SPOTS = 'RESET_LOADED_SPOTS';
 export const CREATE_SPOT = 'CREATE_SPOT';
 export const MODIFY_SPOT = 'MODIFY_SPOT';
 export const REMOVE_SPOT = 'REMOVE_SPOT';
@@ -12,3 +12,6 @@ export const UPDATE_SPOT_FORM = 'UPDATE_SPOT_FORM';
 export const RESET_SPOT_FORM = 'RESET_SPOT_FORM';
 
 export const SAVE_SPOT_TEMP_FILES = 'SAVE_SPOT_TEMP_FILES';
+
+export const FETCH_SPOT = 'FETCH_SPOT';
+export const RECEIVE_SPOT = 'RECEIVE_SPOT';

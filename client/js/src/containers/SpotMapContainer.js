@@ -12,8 +12,8 @@ import * as SpotFileActionCreators from '../actions/SpotFileActionCreators';
 import {Well, Input, Button} from 'react-bootstrap';
 
 import SimpleSpotList from '../components/SimpleSpotList';
-import SpotFormModal from '../components/SpotFormModal';
-import SpotDetailModal from '../components/SpotDetailModal';
+import SpotFormModal from '../components/modals/SpotFormModal';
+import SpotDetailModal from '../components/modals/SpotDetailModal';
 
 const CLUSTERER_LEVEL = 5;
 class SpotMapContainer extends React.Component {
@@ -21,18 +21,11 @@ class SpotMapContainer extends React.Component {
     user: PropTypes.object.isRequired,
     nowLoading: PropTypes.bool.isRequired,
     spots: PropTypes.array.isRequired,
-    spotForm: PropTypes.shape({
-      _id: PropTypes.number,
-      spotName: PropTypes.string,
-      description: PropTypes.string,
-      address: PropTypes.string,
-      geo: []
-    }).isRequired,
+    spotForm: PropTypes.object.isRequired,
     comments: PropTypes.array
   };
 
   state = {
-    nowLoading: false,
     formModal: {
       visible: false
     },
@@ -126,7 +119,7 @@ class SpotMapContainer extends React.Component {
         this.fetchSpotsWithCoordinates();
       });
       event.addListener(map, 'dblclick', (mouseEvent) => {
-        if (this.state.user.isLogin) {
+        if (this.props.user.isLogin) {
           this.showNewSpotFormModal(mouseEvent.latLng);
         } else {
           alert('로그인 후 등록 가능합니다.');
@@ -335,7 +328,8 @@ class SpotMapContainer extends React.Component {
         <SpotDetailModal ref={(spotDetailModal) => { this.spotDetailModal = spotDetailModal; }}
                          visible={detailDisplayModal.visible}
                          spot={detailDisplayModal.displaySpot}
-                         isLogin={user.isLogin}
+                         user={user}
+                         nowCommentLoading={this.props.nowCommentLoading}
                          comments={this.props.comments}
                          onRemove={this.handleSpotRemoveClick}
                          onAddComment={createComment}
@@ -420,7 +414,7 @@ class SpotMapContainer extends React.Component {
   };
 
   handleSpotModifyClick = (spot) => {
-    if (this.state.user.isLogin) {
+    if (this.props.user.isLogin) {
       this.handleModalClose();
       this.showModifySpotFormModal(spot);
     } else {
@@ -429,7 +423,7 @@ class SpotMapContainer extends React.Component {
   };
 
   handleSpotRemoveClick = (spot) => {
-    const {user} = this.state;
+    const {user} = this.props;
 
     const removeAfterCallback = () => {
       this.handleModalClose();
@@ -464,9 +458,10 @@ export default connect(
       user: state.app.user,
       mapConfig: state.app.mapConfig,
       spots: state.spots.spots,
-      spotForm: state.spots.spotForm,
+      spotForm: state.spotForm,
       nowLoading: state.spots.nowLoading,
-      comments: state.comments
+      nowCommentLoading: state.comments.nowLoading,
+      comments: state.comments.comments
     };
   })
 (SpotMapContainer);
