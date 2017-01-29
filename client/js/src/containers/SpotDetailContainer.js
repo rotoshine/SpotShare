@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import $ from 'jquery';
 import _ from 'lodash';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -43,16 +44,18 @@ class SpotDetailContainer extends React.Component {
     const {loadedSpot} = this.props;
 
     const didMountCallback = (loadedSpot) => {
+      $(window).scrollTop(0);
       this.spotDetail.renderRoadView();
       this.commentActions.fetchComments(loadedSpot._id);
       this.renderSpotStaticMap();
     };
 
-    if (!_.isNil(loadedSpot)) {
+    const paramsSpotId = parseInt(this.props.params.spotId);
+    if (!_.isNil(loadedSpot) && loadedSpot._id === paramsSpotId) {
       didMountCallback(loadedSpot);
     } else {
       this.spotActions
-        .requestSpot(this.props.params.spotId)
+        .requestSpot(paramsSpotId)
         .then(didMountCallback);
     }
   }
