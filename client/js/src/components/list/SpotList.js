@@ -24,7 +24,7 @@ export default class SpotList extends React.Component {
 
   renderSearchResult() {
     const {spots, totalCount, query} = this.props;
-    const hasSearchKeyword = query.hasOwnProperty('spotName') && query.spotName.length > 0;
+    const hasSearchKeyword = _.isObject(query) && _.isString(query.spotName) && query.spotName.length > 0;
     const hasSearchResult = _.isArray(spots) && spots.length > 0;
     if (hasSearchKeyword && hasSearchResult) {
       return (

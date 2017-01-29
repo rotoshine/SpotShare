@@ -42,9 +42,13 @@ class SpotListContainer extends React.Component {
   render() {
     const {query} = this.props;
 
+    let keyword = '';
+    if(_.isObject(query) && _.isString(query.spotName)){
+      keyword = query.spotName;
+    }
     return (
       <div className="container" style={{paddingTop: 20}}>
-        <SearchPanel keyword={query.spotName} onSearch={this.handleSearch}/>
+        <SearchPanel keyword={keyword} onSearch={this.handleSearch}/>
         <SpotList {...this.props} onPageClick={this.handlePageClick}/>
       </div>
     );
