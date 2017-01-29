@@ -20,24 +20,33 @@ export function fetchSpotsWithCoordinates(x1, y1, x2, y2) {
   };
 }
 
-export function fetchSpots(query) {
+export function fetchSpots(query, page) {
   let querystrings = [];
   for (let key in query) {
     querystrings.push(`${key}=${query[key]}`);
+  }
+
+  if(page){
+    querystrings.push(`page=${page}`);
   }
   const querystring = querystrings.join('&');
 
   return (dispatch) => {
     dispatch({
-      type: Actions.FETCH_SPOTS
+      type: Actions.FETCH_SPOTS,
+      query: query
     });
 
     return axios.get(`/api/spots?${querystring}`)
       .then((res) => {
+        const {spots, totalCount, page, limit} = res.data;
         dispatch({
           type: Actions.RECEIVE_SPOTS,
-          spots: res.data.spots
-        })
+          spots,
+          totalCount,
+          page,
+          limit
+        });
       });
   };
 }

@@ -1,13 +1,15 @@
 import React, {PropTypes} from 'react';
+import $ from 'jquery';
 import _ from 'lodash';
-import {Link} from 'react-router';
+
 import {connect} from 'react-redux';
 
 import {bindActionCreators} from 'redux';
 import * as SpotsActionCreators from '../actions/SpotsActionCreators';
 
-import {Panel, ButtonGroup, Button, Pagination} from 'react-bootstrap';
-import Loading from '../components/commons/Loading';
+import SearchPanel from '../components/search/SearchPanel';
+import SpotList from '../components/list/SpotList';
+
 /**
  * SpotListContainer component.
  * @author 로토(rotoshine@coupang.com)
@@ -16,7 +18,11 @@ import Loading from '../components/commons/Loading';
 class SpotListContainer extends React.Component {
   static propTypes = {
     nowLoading: PropTypes.bool.isRequired,
-    spots: PropTypes.array,
+    totalCount: PropTypes.number.isRequired,
+    limit: PropTypes.number.isRequired,
+    page: PropTypes.number.isRequired,
+    spots: PropTypes.array.isRequired,
+    query: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired
   };
 
@@ -33,87 +39,38 @@ class SpotListContainer extends React.Component {
     }
   }
 
-  renderSpotList() {
-    let components = [];
-    const {spots} = this.props;
-    const defaultImageUrl = '/images/food_tool.svg';
-    if (_.isArray(spots)) {
-      spots.forEach((spot, i) => {
-        let imageUrl = defaultImageUrl;
-
-        if (_.isArray(spot.files) && spot.files.length > 0) {
-          imageUrl = `/api/spots/${spot._id}/files/${spot.files[0]._id}`
-        }
-        let spotPhotoStyle = {
-          width: 200,
-          height: 200,
-          backgroundImage: `url('${imageUrl}')`
-        };
-
-        components.push(
-          <li key={i}>
-            <Link to={`/spots/${spot._id}`}>
-              <div className="spot-item" style={{border: '1px solid #ccc', marginBottom: 10}}>
-                <div className="spot-photo" style={spotPhotoStyle}/>
-                <div className="spot-description" style={{paddingTop: 15}}>
-                  <h3 className="spot-name" style={{fontSize: '1.5em'}}>
-                    {spot.spotName}
-                  </h3>
-                  <div className="spot-hashtags">
-                    #테스트
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </li>
-        );
-      });
-    }
-
-
-    return components;
-  }
-
-  renderPaging() {
-    return (
-      <Pagination items={10} activePage={1} onSelect={() => {
-      }}/>
-    );
-  }
-
   render() {
-    const {nowLoading} = this.props;
-    if(nowLoading){
-      return (
-        <div className="text-center" style={{marginTop:20}}>
-          <Loading visible={true} />
-        </div>
-      );
-    }
+    const {query} = this.props;
+
     return (
       <div className="container" style={{paddingTop: 20}}>
-        <Panel>
-          정렬
-          <ButtonGroup>
-            <Button className="btn-raised"><i className="fa fa-sort-desc"/>등록일순</Button>
-          </ButtonGroup>
-        </Panel>
-        <Panel>
-          <ul className="list-unstyled spot-list" style={{overflowY: 'auto'}}>
-            {this.renderSpotList()}
-            <div className="text-center">
-              {this.renderPaging()}
-            </div>
-          </ul>
-        </Panel>
+        <SearchPanel keyword={query.spotName} onSearch={this.handleSearch}/>
+        <SpotList {...this.props} onPageClick={this.handlePageClick}/>
       </div>
     );
   }
+
+  handleSearch = (keyword) => {
+    this.spotsAction.fetchSpots({
+      spotName: keyword
+    });
+  };
+
+  handlePageClick = (page) => {
+    $(window).animate({
+      scrollTop: 0
+    }, 300);
+    this.spotsAction.fetchSpots(this.props.query, page);
+  };
 }
 
 export default connect((state) => {
   return {
     nowLoading: state.spots.nowLoading,
-    spots: state.spots.spots
+    spots: state.spots.spots,
+    totalCount: state.spots.totalCount,
+    page: state.spots.page,
+    limit: state.spots.limit,
+    query: state.spots.query
   };
 })(SpotListContainer);

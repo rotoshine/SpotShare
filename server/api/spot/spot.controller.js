@@ -1,7 +1,8 @@
 'use strict';
-const _ = require('lodash');
-const fs = require('fs');
-const mongoose = require('mongoose');
+import _ from 'lodash';
+import mongoose from 'mongoose';
+import spotService from '../../services/spotService';
+
 const Spot = mongoose.model('Spot');
 const SpotHistory = mongoose.model('SpotHistory');
 const handleError = require('../../utils/handleError').handleError;
@@ -10,32 +11,15 @@ const loggingError = (err) => {
   console.error(err);
 };
 
-const findSpots = (query) => {
-  return new Promise((resolve, reject) => {
-    return Spot
-      .find(query)
-      .sort({
-        _id: -1
-      })
-      .populate('files', '_id')
-      .populate('createdBy', 'name provider')
-      .exec()
-      .then(resolve)
-      .catch(reject);
-  });
-};
-
 exports.find = (req, res) => {
   let query = req.query;
   query.isDisplay = true;
 
-  return findSpots(query)
-    .then((spots) => {
-      return res.json({spots: spots});
-    })
-    .catch((e) => {
-      return res.status(500).json({message: e.message});
-    });
+  return spotService.find(query).then((result) => {
+    return res.json(result);
+  }).catch((e) => {
+    return res.status(500).json({message: e.message});
+  });
 };
 exports.findWithCoordinates = (req, res) => {
   let queryParams = req.query;
@@ -44,7 +28,7 @@ exports.findWithCoordinates = (req, res) => {
   let y1 = queryParams.y1;
   let y2 = queryParams.y2;
 
-  return findSpots({
+  return spotService.find({
     geo: {
       $geoWithin: {
         $box: [
@@ -53,17 +37,15 @@ exports.findWithCoordinates = (req, res) => {
       }
     },
     isDisplay: true
-  })
-    .then((spots) => {
-      return res.json({
-        spots: spots
-      });
-    })
-    .catch((e) => {
-      return res.status(500).json({
-        message: e.message
-      });
+  }).then((result) => {
+    return res.json({
+      spots: result.spots
     });
+  }).catch((e) => {
+    return res.status(500).json({
+      message: e.message
+    });
+  });
 
 };
 
