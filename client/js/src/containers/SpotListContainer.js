@@ -3,7 +3,6 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import {connect} from 'react-redux';
-
 import {bindActionCreators} from 'redux';
 import * as SpotsActionCreators from '../actions/SpotsActionCreators';
 
@@ -23,6 +22,7 @@ class SpotListContainer extends React.Component {
     page: PropTypes.number.isRequired,
     spots: PropTypes.array.isRequired,
     query: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired
   };
 
@@ -55,6 +55,8 @@ class SpotListContainer extends React.Component {
   }
 
   handleSearch = (keyword) => {
+    const {history} = this.props;
+    history.push(`/spots?spotName=${keyword}`);
     this.spotsAction.fetchSpots({
       spotName: keyword
     });

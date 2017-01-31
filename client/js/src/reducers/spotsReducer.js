@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 const initialSpotsState = {
   nowLoading: true,
-  spots: null,
+  spots: [],
   totalCount: 0,
   page: 1,
   limit: 0,
