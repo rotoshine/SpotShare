@@ -158,12 +158,11 @@ html, body, .root {
 
 /* spot detail */
 .spot-detail-contents-container{
-  display: flex;
-  flex-direction:row;
+  display: block;
 }
 
 .spot-detail-contents-container .spot-detail-media{
-  width: 50%;
+  width: 100%;
   height: 300px;
   border: 1px solid #ccc;
 }

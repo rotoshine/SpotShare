@@ -8,6 +8,8 @@ export default {
 
     if(!query.hasOwnProperty('isDisplay')){
       findQuery.isDisplay = true;
+    }else{
+      findQuery.isDisplay = query.isDisplay;
     }
 
     let sort = {

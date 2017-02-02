@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import { withRouter } from 'react-router';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -22,7 +23,7 @@ class SpotListContainer extends React.Component {
     page: PropTypes.number.isRequired,
     spots: PropTypes.array.isRequired,
     query: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
+    router: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired
   };
 
@@ -39,6 +40,10 @@ class SpotListContainer extends React.Component {
     }
   }
 
+  updateUrl(url){
+    const {router} = this.props;
+    router.push(url);
+  }
   render() {
     const {query} = this.props;
 
@@ -55,22 +60,30 @@ class SpotListContainer extends React.Component {
   }
 
   handleSearch = (keyword) => {
-    const {history} = this.props;
-    history.push(`/spots?spotName=${keyword}`);
+    this.updateUrl(`/spots?spotName=${keyword}`);
     this.spotsAction.fetchSpots({
       spotName: keyword
     });
   };
 
   handlePageClick = (page) => {
+    const {query} = this.props;
+    let nextQueryString = [
+      `page=${page}`
+    ];
+
+    if(query && query.spotName && query.spotName.length > 0){
+      nextQueryString.push(`spotName=${query.spotName}`);
+    }
+    this.updateUrl(`/spots?${nextQueryString.join('&')}`);
+    this.spotsAction.fetchSpots(this.props.query, page);
     $(window).animate({
       scrollTop: 0
     }, 300);
-    this.spotsAction.fetchSpots(this.props.query, page);
   };
 }
 
-export default connect((state) => {
+export default withRouter(connect((state) => {
   return {
     nowLoading: state.spots.nowLoading,
     spots: state.spots.spots,
@@ -79,4 +92,4 @@ export default connect((state) => {
     limit: state.spots.limit,
     query: state.spots.query
   };
-})(SpotListContainer);
+})(SpotListContainer));

@@ -24,12 +24,12 @@ export default class SearchPanel extends React.Component {
       <Panel>
         <Row>
           <form onSubmit={this.handleSubmit}>
-            <div className="col-xs-10">
+            <div className="col-sm-10 col-xs-9">
               <FormGroup>
                 <FormControl type="text" placeholder="검색어를 입력하세요." value={keyword} onChange={this.handleChange}/>
               </FormGroup>
             </div>
-            <div className="col-xs-2">
+            <div className="col-sm-2 col-xs-3">
               <Button type="submit" className="btn-raised" bsStyle="info" style={{height:50}}>
                 <i className="fa fa-search"/>
               </Button>

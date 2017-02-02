@@ -15,7 +15,7 @@ exports.find = (req, res) => {
   let query = req.query;
   query.isDisplay = true;
 
-  return spotService.find(query).then((result) => {
+  return spotService.find(query, true).then((result) => {
     return res.json(result);
   }).catch((e) => {
     return res.status(500).json({message: e.message});
@@ -73,7 +73,6 @@ exports.save = (req, res) => {
   let spot = new Spot(body);
   spot.createdBy = req.user._id;
 
-  console.log(spot);
   return spot
     .save()
     .then((savedSpot) => {
