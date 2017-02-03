@@ -29,6 +29,10 @@ export default {
       findQuery.spotName = new RegExp(query.spotName, 'i');
     }
 
+    if(query.geo){
+      findQuery.geo = query.geo;
+    }
+
     let result = {
       spots: [],
       totalCount: 0,
@@ -36,9 +40,12 @@ export default {
       limit,
       query: {
         spotName: query.spotName,
-        isDisplay: findQuery.isDisplay
+        isDisplay: findQuery.isDisplay,
+        geo: findQuery.geo || {}
       }
     };
+
+
 
     return new Promise((resolve, reject) => {
       const queryRunner = Spot

@@ -36,8 +36,8 @@ exports.findWithCoordinates = (req, res) => {
         ]
       }
     },
-    isDisplay: true
-  }).then((result) => {
+    isDisplay: true,
+  }, false).then((result) => {
     return res.json({
       spots: result.spots
     });

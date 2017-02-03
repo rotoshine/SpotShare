@@ -10,7 +10,7 @@ export default {
       path: '/spots',
       component: require('./containers/SpotListContainer').default,
       onLeave: () => {
-        console.log('leave..');
+
       }
     },
     {
