@@ -1,5 +1,3 @@
-'use strict';
-
 require('dotenv').config();
 import logger from './utils/logger';
 import config from './config';

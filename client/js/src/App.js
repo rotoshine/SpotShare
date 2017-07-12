@@ -1,7 +1,13 @@
-import React, {PropTypes} from 'react';
-import {connect} from 'react-redux';
-import {Navbar, Nav, NavItem} from 'react-bootstrap';
-import {LinkContainer} from 'react-router-bootstrap';
+import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { Navbar, Nav, NavItem} from 'react-bootstrap';
+import { Switch, Route, Link, withRouter } from 'react-router-dom';
+import RouteNavItem from './components/RouterNavItem';
+import SpotMapContainer from './containers/SpotMapContainer';
+import SpotListContainer from './containers/SpotListContainer';
+import SpotDetailContainer from './containers/SpotDetailContainer';
+import SpotFormContainer from './containers/SpotFormContainer';
+import NotFoundContainer from './containers/errors/NotFoundContainer';
 
 /**
  * App Component
@@ -9,22 +15,21 @@ import {LinkContainer} from 'react-router-bootstrap';
 class App extends React.Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
     providers: PropTypes.array.isRequired,
     defaultTitle: PropTypes.string.isRequired,
-    children: PropTypes.oneOfType([PropTypes.element, PropTypes.array])
+    children: PropTypes.oneOfType([ PropTypes.element, PropTypes.array ])
   };
 
-  componentDidMount() {
-    window & window.$ && window.$.material.init();
+  componentDidMount () {
+    window && window.$ && window.$.material.init();
   }
 
-  renderLoginProviders() {
-    const {user} = this.props;
-    if (user.isLogin) {
+  renderLoginProviders () {
+    const { user } = this.props;
+    if ( user.isLogin ) {
       return (
         <li eventKey={1} key={1}>
-          <div className="bs-components" style={{marginTop: 10}}>
+          <div className="bs-components" style={{ marginTop: 10 }}>
             <a href="/logout" className="btn btn-raised btn-xs btn-danger">Logout</a>
           </div>
         </li>
@@ -45,12 +50,12 @@ class App extends React.Component {
 
   }
 
-  render() {
-    const {user} = this.props;
+  render () {
+    const { user } = this.props;
 
     let userComponent = null;
 
-    if (user.isLogin) {
+    if ( user.isLogin ) {
       userComponent = (
         <NavItem>
           <span className="label label-info">Hello <i className={`fa fa-${user.provider}`}/>{user.name}!</span>
@@ -59,24 +64,18 @@ class App extends React.Component {
     }
 
     return (
-      <section style={{width: '100%', height: '100%'}}>
-        <Navbar style={{marginBottom: 0}} inverse>
+      <section style={{ width: '100%', height: '100%' }}>
+        <Navbar style={{ marginBottom: 0 }} inverse>
           <Navbar.Header>
             <Navbar.Brand>
-              <LinkContainer to="/">
-                <a href="/">{this.props.defaultTitle}</a>
-              </LinkContainer>
+              <Link to="/">{this.props.defaultTitle}</Link>
             </Navbar.Brand>
             <Navbar.Toggle />
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav>
-              <LinkContainer to="/map">
-                <NavItem eventKey={1}>Spot Map</NavItem>
-              </LinkContainer>
-              <LinkContainer to="/spots" onClick={this.handleSpotListMenuClick}>
-                <NavItem eventKey={2}>Spot List</NavItem>
-              </LinkContainer>
+                <RouteNavItem eventKey={1} to="/map">Spot Map</RouteNavItem>
+                <RouteNavItem eventKey={2} to="/spots" onClick={this.handleSpotListMenuClick}>Spot List</RouteNavItem>
             </Nav>
             <Nav pullRight>
               {userComponent}
@@ -84,24 +83,32 @@ class App extends React.Component {
             </Nav>
           </Navbar.Collapse>
         </Navbar>
-        {this.props.children}
+        <Switch>
+          <Route path="/" exact component={SpotMapContainer}/>
+          <Route path="/map" exact component={SpotMapContainer}/>
+          <Route path="/spots" exact component={SpotListContainer}/>
+          <Route path="/spots/:spotId" exact componen={SpotDetailContainer}/>
+          <Route path="/spots/:spotId/form" exact component={SpotFormContainer}/>
+          <Route path="/*" component={NotFoundContainer}/>
+        </Switch>
       </section>
     );
   }
 
   handleSpotListMenuClick = (e) => {
-    const {dispatch, location} = this.props;
-    if(location.pathname !== '/spots'){
+    console.log(this.props);
+    const { dispatch, location } = this.props;
+    if ( location.pathname !== '/spots' ) {
       dispatch({
         type: 'RESET_LOADED_SPOTS'
       });
-    }else{
+    } else {
       e.preventDefault();
     }
   };
 }
 
-export default connect(
+const ConnectedApp = connect(
   (state) => {
     return {
       user: state.app.user,
@@ -110,3 +117,5 @@ export default connect(
     };
   })
 (App);
+
+export default withRouter(ConnectedApp);

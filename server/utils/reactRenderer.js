@@ -5,10 +5,8 @@ import {renderToString} from 'react-dom/server';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';
 import reducers from '../../client/js/src/reducers';
-
-import {match, RouterContext} from 'react-router';
-import routes from '../../client/js/src/routes';
-
+import {StaticRouter, Redirect} from 'react-router-dom';
+import App from '../../client/js/src/App';
 import config from '../config';
 
 export default function handleRender(req, res) {
@@ -47,29 +45,28 @@ export default function handleRender(req, res) {
   global.document = {};
   global.navitator = {};
 
+  const context = {};
   const preloadedStateJSONString = JSON.stringify(finalState);
-  match({routes, location: req.url}, (error, redirectLocation, renderProps) => {
-    if (error) {
-      return res.status(500).send(error.message);
-    } else if (redirectLocation) {
-      res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-    } else if(renderProps){
-      const html = renderToString(
-        <Provider store={store}>
-          <RouterContext {...renderProps} />
-        </Provider>
-      );
+  const html = renderToString(
+    <Provider store={store}>
+      <StaticRouter location={req.url}
+                    context={context}>
+        <App location={req.url}/>
+      </StaticRouter>
+    </Provider>
+  );
 
-      return res.render('index', {
-        html: html,
-        preloadedState: preloadedStateJSONString,
-        fireBase: config.fireBase,
-        mapApiKey: config.map.apiKey,
-        googleAnalyticsKey: config.googleAnalyticsKey || '',
-        meta: meta
-      });
-    }else{
-      res.status(404).send('not found')
-    }
-  });
+  if (context.url) {
+    // Somewhere a `<Redirect>` was rendered
+    Redirect(301, context.url)
+  } else {
+    return res.render('index', {
+      html: html,
+      preloadedState: preloadedStateJSONString,
+      fireBase: config.fireBase,
+      mapApiKey: config.map.apiKey,
+      googleAnalyticsKey: config.googleAnalyticsKey || '',
+      meta: meta
+    });
+  }
 }

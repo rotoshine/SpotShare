@@ -1,0 +1,10 @@
+[ignore]
+client/js/dist
+[include]
+client/js/src
+
+[libs]
+
+[options]
+
+[lints]

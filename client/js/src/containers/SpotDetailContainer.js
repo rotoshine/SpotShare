@@ -4,7 +4,7 @@ import _ from 'lodash';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Row, Col, Panel} from 'react-bootstrap';
-import {Link} from 'react-router';
+import {Link} from 'react-router-dom';
 import * as SpotActionCreators from '../actions/SpotActionCreators';
 import * as CommentActionCreators from '../actions/CommentActionCreators';
 

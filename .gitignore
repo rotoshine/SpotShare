@@ -8,3 +8,6 @@ uploads
 
 // logger
 *.log
+
+
+/flow-typed/npm

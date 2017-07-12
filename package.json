@@ -10,11 +10,12 @@
     "prenodemon": "npm install",
     "preinstall": "npm prune",
     "prestart": "npm install",
-    "prestart-dev": "npm install"
+    "prestart-dev": "npm install",
+    "flow": "flow"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rotoshine/board-spot.git"
+    "url": "https://github.com/rotoshine/SpotShare.git"
   },
   "keywords": [
     "longboard",
@@ -24,7 +25,7 @@
   "author": "로토 <rotoshine@gmail.com> (http://github.com/rotoshine)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rotoshine/board-spot/issues"
+    "url": "https://github.com/rotoshine/SpotShare/issues"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
@@ -60,6 +61,7 @@
     "express-handlebars": "^3.0.0",
     "express-session": "^1.13.0",
     "fb": "^1.1.1",
+    "flow-bin": "^0.49.1",
     "glob": "^7.0.3",
     "gm": "^1.23.0",
     "immutable": "^3.8.1",
@@ -74,17 +76,16 @@
     "passport-facebook": "^2.1.0",
     "passport-kakao": "0.0.4",
     "passport-twitter": "^1.0.4",
-    "react": "^15.0.0",
-    "react-bootstrap": "0.30.7",
-    "react-dom": "^15.0.0",
+    "react": "^15.6.1",
+    "react-bootstrap": "^0.31.0",
+    "react-dom": "^15.6.1",
     "react-dropzone": "^3.8.0",
     "react-nl2br": "^0.2.0",
-    "react-redux": "^4.4.5",
-    "react-router": "^2.4.0",
+    "react-redux": "^5.0.5",
     "react-router-bootstrap": "^0.23.1",
-    "react-router-redux": "^4.0.4",
-    "redux": "^3.5.2",
-    "redux-thunk": "^2.1.0",
+    "react-router-dom": "^4.1.1",
+    "redux": "^3.7.1",
+    "redux-thunk": "^2.2.0",
     "winston": "^2.3.0"
   }
 }
