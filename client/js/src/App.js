@@ -86,17 +86,16 @@ class App extends React.Component {
         <Switch>
           <Route path="/" exact component={SpotMapContainer}/>
           <Route path="/map" exact component={SpotMapContainer}/>
-          <Route path="/spots" exact component={SpotListContainer}/>
-          <Route path="/spots/:spotId" exact componen={SpotDetailContainer}/>
-          <Route path="/spots/:spotId/form" exact component={SpotFormContainer}/>
-          <Route path="/*" component={NotFoundContainer}/>
+          <Route path="/spots" exact strict component={SpotListContainer}/>
+          <Route path="/spots/:spotId" exact strict component={SpotDetailContainer}/>
+          <Route path="/spots/:spotId/form" exact strict component={SpotFormContainer}/>
+          <Route component={NotFoundContainer}/>
         </Switch>
       </section>
     );
   }
 
   handleSpotListMenuClick = (e) => {
-    console.log(this.props);
     const { dispatch, location } = this.props;
     if ( location.pathname !== '/spots' ) {
       dispatch({

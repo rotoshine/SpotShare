@@ -8,6 +8,7 @@ import _ from 'lodash';
 import * as SpotActionCreators from '../actions/SpotsActionCreators';
 import * as CommentActionCreators from '../actions/CommentActionCreators';
 import * as SpotFileActionCreators from '../actions/SpotFileActionCreators';
+import * as SpotMapActionCreators from '../actions/SpotMapActionCreators';
 
 import {Well, Input, Button} from 'react-bootstrap';
 
@@ -43,6 +44,7 @@ class SpotMapContainer extends React.Component {
     const {dispatch} = props;
 
     this.actions = bindActionCreators(SpotActionCreators, dispatch);
+    this.mapActions = bindActionCreators(SpotMapActionCreators, dispatch);
     this.commentActions = bindActionCreators(CommentActionCreators, dispatch);
     this.spotFileActions = bindActionCreators(SpotFileActionCreators, dispatch);
 
@@ -145,7 +147,7 @@ class SpotMapContainer extends React.Component {
     const swLatLng = bounds.getSouthWest();
     const neLatLng = bounds.getNorthEast();
 
-    this.actions.fetchSpotsWithCoordinates(
+    this.mapActions.fetchSpotsWithCoordinates(
       neLatLng.getLat(),
       neLatLng.getLng(),
       swLatLng.getLat(),
@@ -457,9 +459,9 @@ export default connect(
     return {
       user: state.app.user,
       mapConfig: state.app.mapConfig,
-      spots: state.spots.spots,
+      spots: state.spotMap.spots,
       spotForm: state.spotForm,
-      nowLoading: state.spots.nowLoading,
+      nowLoading: state.spotMap.nowLoading,
       nowCommentLoading: state.comments.nowLoading,
       comments: state.comments.comments
     };

@@ -41,11 +41,9 @@ export default {
       query: {
         spotName: query.spotName,
         isDisplay: findQuery.isDisplay,
-        geo: findQuery.geo || {}
+        geo: findQuery.geo
       }
     };
-
-
 
     return new Promise((resolve, reject) => {
       const queryRunner = Spot

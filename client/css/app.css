@@ -9,7 +9,7 @@ html, body, .root {
 /* utils */
 .bg-center {
   background-position:center;
-  background-size: cover;
+  background-size: contain;
   background-repeat: no-repeat;
 }
 
@@ -107,6 +107,7 @@ html, body, .root {
   height: 100px;
   border: 1px solid #ddd;
   border-radius: 3px;
+  background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
 }

@@ -5,7 +5,7 @@ import {renderToString} from 'react-dom/server';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';
 import reducers from '../../client/js/src/reducers';
-import {StaticRouter, Redirect} from 'react-router-dom';
+import {StaticRouter} from 'react-router-dom';
 import App from '../../client/js/src/App';
 import config from '../config';
 
@@ -36,7 +36,6 @@ export default function handleRender(req, res) {
 
   const store = createStore(reducers, preloadedState);
   const finalState = store.getState();
-
   // meta tag
   const meta = req.meta ? req.meta : config.meta;
 
@@ -58,7 +57,7 @@ export default function handleRender(req, res) {
 
   if (context.url) {
     // Somewhere a `<Redirect>` was rendered
-    Redirect(301, context.url)
+    return res.redirect(context.url)
   } else {
     return res.render('index', {
       html: html,

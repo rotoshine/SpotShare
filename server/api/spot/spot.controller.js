@@ -1,4 +1,3 @@
-'use strict';
 import _ from 'lodash';
 import mongoose from 'mongoose';
 import spotService from '../../services/spotService';
@@ -39,7 +38,11 @@ exports.findWithCoordinates = (req, res) => {
     isDisplay: true,
   }, false).then((result) => {
     return res.json({
-      spots: result.spots
+      spots: result.spots,
+      query: {},
+      limit: 0,
+      page: 1,
+      totalCount: result.spots.length
     });
   }).catch((e) => {
     return res.status(500).json({

@@ -1,0 +1,2 @@
+export const FETCH_MAP_SPOTS = 'FETCH_MAP_SPOTS';
+export const RECEIVE_MAP_SPOTS = 'RECEIVE_MAP_SPOTS';

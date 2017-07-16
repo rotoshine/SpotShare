@@ -2,7 +2,7 @@ import * as Actions from './spotsActions';
 
 import axios from 'axios';
 
-export function fetchSpotsWithCoordinates(x1, y1, x2, y2) {
+export function fetchSpotsWithCoordinates (x1, y1, x2, y2) {
   return (dispatch) => {
     dispatch({
       type: Actions.FETCH_SPOTS
@@ -16,17 +16,18 @@ export function fetchSpotsWithCoordinates(x1, y1, x2, y2) {
           type: Actions.RECEIVE_SPOTS,
           spots: result.data.spots
         });
-      })
+      });
   };
 }
 
-export function fetchSpots(query, page) {
+export function fetchSpots (query, page) {
+  console.log(query);
   let querystrings = [];
-  for (let key in query) {
-    querystrings.push(`${key}=${query[key]}`);
+  for ( let key in query ) {
+    querystrings.push(`${key}=${query[ key ]}`);
   }
 
-  if(page){
+  if ( page ) {
     querystrings.push(`page=${page}`);
   }
   const querystring = querystrings.join('&');
@@ -39,7 +40,7 @@ export function fetchSpots(query, page) {
 
     return axios.get(`/api/spots?${querystring}`)
       .then((res) => {
-        const {spots, totalCount, page, limit} = res.data;
+        const { spots, totalCount, page, limit } = res.data;
         dispatch({
           type: Actions.RECEIVE_SPOTS,
           spots,
@@ -51,16 +52,16 @@ export function fetchSpots(query, page) {
   };
 }
 
-export function requestSpots(x1, y1, x2, y2) {
+export function requestSpots (x1, y1, x2, y2) {
   return fetchSpots(x1, y1, x2, y2);
 }
 
-export function createOrUpdateSpot(spot) {
+export function createOrUpdateSpot (spot) {
   const uploadedFiles = spot.files;
   delete spot.files;
   return (dispatch) => {
     return new Promise((resolve, reject) => {
-      if (spot._id) {
+      if ( spot._id ) {
         dispatch({
           type: Actions.MODIFY_SPOT,
           spot: spot
@@ -92,10 +93,10 @@ export function createOrUpdateSpot(spot) {
         }).catch(reject);
       }
     });
-  }
+  };
 }
 
-export function removeSpot(spotId) {
+export function removeSpot (spotId) {
   return (dispatch) => {
     dispatch({
       type: Actions.REMOVE_SPOT,
@@ -103,10 +104,10 @@ export function removeSpot(spotId) {
     });
 
     return axios.delete(`/api/spots/${spotId}`);
-  }
+  };
 }
 
-export function removeRequestSpot(spotId) {
+export function removeRequestSpot (spotId) {
   return (dispatch) => {
     dispatch({
       type: Actions.REMOVE_REQUEST_SPOT,
@@ -114,23 +115,23 @@ export function removeRequestSpot(spotId) {
     });
 
     return axios.post(`/api/spots/${spotId}/remove-request`);
-  }
+  };
 }
-export function likeSpot(spotId) {
+export function likeSpot (spotId) {
   return {
     type: Actions.LIKE_SPOT,
     spotId: spotId
   };
 }
 
-export function setSpotForm(spotForm) {
+export function setSpotForm (spotForm) {
   return {
     type: Actions.SET_SPOT_FORM,
     spotForm: spotForm
   };
 }
 
-export function updateSpotForm(field, value) {
+export function updateSpotForm (field, value) {
   return {
     type: Actions.UPDATE_SPOT_FORM,
     field: field,
@@ -138,7 +139,7 @@ export function updateSpotForm(field, value) {
   };
 }
 
-export function resetSpotForm() {
+export function resetSpotForm () {
   return {
     type: Actions.RESET_SPOT_FORM
   };

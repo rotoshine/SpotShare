@@ -1,10 +1,10 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {Row, Col, Panel} from 'react-bootstrap';
-import {Link} from 'react-router-dom';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Row, Col, Panel } from 'react-bootstrap';
+import { Link, withRouter } from 'react-router-dom';
 import * as SpotActionCreators from '../actions/SpotActionCreators';
 import * as CommentActionCreators from '../actions/CommentActionCreators';
 
@@ -22,7 +22,7 @@ class SpotDetailContainer extends React.Component {
     loadedSpot: PropTypes.object,
     nowCommentsLoading: PropTypes.bool.isRequired,
     comments: PropTypes.array,
-    params: PropTypes.object.isRequired,
+    match: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
     history: PropTypes.object.isRequired
   };
@@ -31,17 +31,17 @@ class SpotDetailContainer extends React.Component {
     nowCommentsLoading: false
   };
 
-  constructor(props) {
+  constructor (props) {
     super(props);
 
-    const {dispatch} = props;
+    const { dispatch } = props;
     this.spotDetail = null;
     this.spotActions = bindActionCreators(SpotActionCreators, dispatch);
     this.commentActions = bindActionCreators(CommentActionCreators, dispatch);
   }
 
-  componentDidMount() {
-    const {loadedSpot} = this.props;
+  componentDidMount () {
+    const { loadedSpot, match } = this.props;
 
     const didMountCallback = (loadedSpot) => {
       $(window).scrollTop(0);
@@ -50,8 +50,8 @@ class SpotDetailContainer extends React.Component {
       this.renderSpotStaticMap();
     };
 
-    const paramsSpotId = parseInt(this.props.params.spotId);
-    if (!_.isNil(loadedSpot) && loadedSpot._id === paramsSpotId) {
+    const paramsSpotId = parseInt(match.params.spotId);
+    if ( !_.isNil(loadedSpot) && loadedSpot._id === paramsSpotId ) {
       didMountCallback(loadedSpot);
     } else {
       this.spotActions
@@ -60,11 +60,11 @@ class SpotDetailContainer extends React.Component {
     }
   }
 
-  renderSpotStaticMap() {
-    const {loadedSpot} = this.props;
+  renderSpotStaticMap () {
+    const { loadedSpot } = this.props;
 
-     if (!_.isNil(loadedSpot) && window.daum) {
-      const position = new daum.maps.LatLng(loadedSpot.geo[0], loadedSpot.geo[1]);
+    if ( !_.isNil(loadedSpot) && window.daum ) {
+      const position = new daum.maps.LatLng(loadedSpot.geo[ 0 ], loadedSpot.geo[ 1 ]);
       const marker = {
         position: position,
         text: loadedSpot.spotName
@@ -82,22 +82,24 @@ class SpotDetailContainer extends React.Component {
     }
   }
 
-  render() {
-    const {app, loadedSpot, nowCommentsLoading, comments} = this.props;
-    const {user} = app;
-    const {isLogin} = user;
-    const {createComment, removeComment} = this.commentActions;
+  render () {
+    const { app, loadedSpot, nowCommentsLoading, comments } = this.props;
+    const { user } = app;
+    const { isLogin } = user;
+    const { createComment, removeComment } = this.commentActions;
 
-    if (!_.isNil(loadedSpot)) {
+    if ( !_.isNil(loadedSpot) ) {
       return (
         <div className="container spot-detail-container">
           <Row>
             <Col xs={12}>
-              <Panel style={{marginTop: 10}}
+              <Panel style={{ marginTop: 10 }}
                      bsStyle="info"
                      header={loadedSpot.spotName}>
-                <div id="map" style={{width: '100%', height: 300, marginBottom: 20}}/>
-                <SpotDetail ref={(spotDetail) => { this.spotDetail = spotDetail; }}
+                <div id="map" style={{ width: '100%', height: 300, marginBottom: 20 }}/>
+                <SpotDetail ref={(spotDetail) => {
+                  this.spotDetail = spotDetail;
+                }}
                             spot={loadedSpot}
                             isLogin={isLogin}
                             onRemove={this.handleSpotRemoveClick}
@@ -116,7 +118,7 @@ class SpotDetailContainer extends React.Component {
             </Col>
             <Col xs={12} className="text-right">
               <Link to="/spots" className="btn btn-info btn-raised">
-                <i className="fa fa-list-ul" style={{marginRight:10}}/>
+                <i className="fa fa-list-ul" style={{ marginRight: 10 }}/>
                 Move List
               </Link>
             </Col>
@@ -124,13 +126,13 @@ class SpotDetailContainer extends React.Component {
         </div>
       );
     } else {
-      return null;
+      return <div>now loading..</div>;
     }
   }
 
   handleSpotModifyClick = (spot) => {
-    const {app, history} = this.props;
-    if (app.user.isLogin) {
+    const { app, history } = this.props;
+    if ( app.user.isLogin ) {
       history.push(`/spots/${spot._id}/form`);
     } else {
       alert('로그인 후 수정 가능합니다.');
@@ -138,33 +140,33 @@ class SpotDetailContainer extends React.Component {
   };
 
   handleSpotRemoveClick = (spot) => {
-    const {user} = this.props.app;
+    const { user } = this.props.app;
 
     const removeAfterCallback = () => {
       this.handleModalClose();
       this.fetchSpotsWithCoordinates();
     };
-    if (user.isLogin) {
-      if (user._id === spot.createdBy._id) {
-        if (confirm('공유하신 스팟을 삭제하시겠습니까?')) {
+    if ( user.isLogin ) {
+      if ( user._id === spot.createdBy._id ) {
+        if ( confirm('공유하신 스팟을 삭제하시겠습니까?') ) {
           this.actions.removeSpot(spot._id).then(removeAfterCallback);
         }
       } else {
-        if (confirm('등록한 사용자가 아니기 때문에 삭제요청만 가능합니다.\n삭제요청하시겠습니까?')) {
+        if ( confirm('등록한 사용자가 아니기 때문에 삭제요청만 가능합니다.\n삭제요청하시겠습니까?') ) {
           this.actions.removeRequestSpot(spot._id).then(removeAfterCallback);
         }
       }
     } else {
       alert('로그인 하세요.');
     }
-  }
+  };
 }
 
-export default connect((state) => {
+export default withRouter(connect((state) => {
   return {
     app: state.app,
     loadedSpot: state.spot.loadedSpot,
     nowCommentsLoading: state.comments.nowLoading,
     comments: state.comments.comments
   };
-})(SpotDetailContainer)
+})(SpotDetailContainer));

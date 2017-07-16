@@ -10,7 +10,7 @@ function comments(state = initialState, action) {
     case CommentAction.RESET_COMMENTS:
       return _.assign({}, initialState);
     case CommentAction.FETCH_COMMENTS:
-      return _.assign({
+      return _.assign({}, state, {
         nowLoading: true
       });
     case CommentAction.RECIEVE_COMMENTS:

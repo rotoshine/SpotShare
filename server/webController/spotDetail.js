@@ -7,6 +7,7 @@ import fileUtils from '../utils/fileUtils';
 const Spot = mongoose.model('Spot');
 module.exports = (app) => {
   app.get('/spots/:spotId', (req, res, next) => {
+
     const spotId = req.params.spotId;
     Spot
       .findById(spotId)
@@ -53,6 +54,7 @@ module.exports = (app) => {
             imageUrl: imageUrl
           }
         };
+
         next();
       })
       .catch((err) => {
