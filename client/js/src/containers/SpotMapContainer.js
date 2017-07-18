@@ -6,9 +6,9 @@ import _ from 'lodash';
 
 // action creators
 import * as SpotActionCreators from '../actions/SpotsActionCreators';
-import * as CommentActionCreators from '../actions/CommentActionCreators';
+import * as commentActions from '../actions/commentActions';
 import * as SpotFileActionCreators from '../actions/SpotFileActionCreators';
-import * as SpotMapActionCreators from '../actions/SpotMapActionCreators';
+import * as spotMapActions from '../actions/spotMapActions';
 
 import {Well, Input, Button} from 'react-bootstrap';
 
@@ -44,8 +44,6 @@ class SpotMapContainer extends React.Component {
     const {dispatch} = props;
 
     this.actions = bindActionCreators(SpotActionCreators, dispatch);
-    this.mapActions = bindActionCreators(SpotMapActionCreators, dispatch);
-    this.commentActions = bindActionCreators(CommentActionCreators, dispatch);
     this.spotFileActions = bindActionCreators(SpotFileActionCreators, dispatch);
 
     this.markers = [];
@@ -143,17 +141,18 @@ class SpotMapContainer extends React.Component {
   }
 
   fetchSpotsWithCoordinates() {
+    const { dispatch } = this.props;
+
     const bounds = this.map.getBounds();
     const swLatLng = bounds.getSouthWest();
     const neLatLng = bounds.getNorthEast();
 
-    this.mapActions.fetchSpotsWithCoordinates(
-      neLatLng.getLat(),
-      neLatLng.getLng(),
-      swLatLng.getLat(),
-      swLatLng.getLng()
-    ).then(() => {
-      this.renderMarkers();
+    dispatch({
+      type: spotMapActions.FETCH_MAP_SPOTS,
+      x1: neLatLng.getLat(),
+      y1: neLatLng.getLng(),
+      x2: swLatLng.getLat(),
+      y2: swLatLng.getLng()
     });
   }
 
@@ -211,7 +210,11 @@ class SpotMapContainer extends React.Component {
   }
 
   showSpotDetail(spot) {
-    this.commentActions.fetchComments(spot._id);
+    const { dispatch } = this.props;
+    dispatch({
+      type: commentActions.FETCH_COMMENTS,
+      spotId: spot._id
+    });
 
     this.setState({
       detailDisplayModal: {
@@ -321,9 +324,12 @@ class SpotMapContainer extends React.Component {
 
   render() {
     const {formModal, detailDisplayModal} = this.state;
-    const {user, spots, spotForm, nowLoading} = this.props;
+    const {user, spots, spotForm, nowLoading, dispatch} = this.props;
 
-    const {createComment, removeComment} = this.commentActions;
+
+    if(_.isArray(spots) && spots.length > 0) {
+      this.renderMarkers();
+    }
 
     return (
       <div>
@@ -334,8 +340,8 @@ class SpotMapContainer extends React.Component {
                          nowCommentLoading={this.props.nowCommentLoading}
                          comments={this.props.comments}
                          onRemove={this.handleSpotRemoveClick}
-                         onAddComment={createComment}
-                         onRemoveComment={removeComment}
+                         onAddComment={(spotId, content) => dispatch({type: commentActions.CREATE_COMMENT, spotId, content})}
+                         onRemoveComment={() => {}}
                          onLike={this.handleSpotLike}
                          onClose={this.handleModalClose}
                          onModifyClick={this.handleSpotModifyClick}/>

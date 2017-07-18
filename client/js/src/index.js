@@ -5,12 +5,14 @@ import createHistory from 'history/createBrowserHistory';
 import configureStore from './store/configureStore';
 import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
-
+import rootSaga from './sagas';
 // containers
 
 const preloadedState = window.__PRELOADED_STATE__;
 const store = configureStore(preloadedState);
 const history = createHistory();
+
+store.runSaga(rootSaga);
 const rootInstance = ReactDOM.render(
   (
     <Provider store={store}>

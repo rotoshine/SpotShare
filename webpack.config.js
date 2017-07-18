@@ -6,6 +6,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 let entry = [
+  'babel-polyfill',
   './client/js/src/index'
 ];
 
@@ -14,6 +15,7 @@ let devtool = '#cheap-module-eval-source-map';
 let plugins = [];
 if(argv.mode !== 'production'){
   entry = [
+    'babel-polyfill',
     'webpack/hot/dev-server',
     'webpack-hot-middleware/client',
     './client/js/src/index'
@@ -40,7 +42,6 @@ if(argv.mode !== 'production'){
 }
 
 
-
 module.exports = {
   devtool: devtool,
   entry: entry,
@@ -55,7 +56,60 @@ module.exports = {
       {
         test: /\.js$/,
         loaders: loaders,
-        include: path.join(__dirname, 'client/js/src')
+        include: path.join(__dirname, 'client/js/src'),
+        options: {
+          plugins: [
+            [
+              'import',
+              {
+                'libraryName': 'antd',
+                'style': true
+              }
+            ]
+          ],
+          // This is a feature of `babel-loader` for webpack (not Babel itself).
+          // It enables caching results in ./node_modules/.cache/babel-loader/
+          // directory for faster rebuilds.
+          cacheDirectory: true
+        }
+      },
+      {
+        test: /\.css$/,
+        use: [
+          require.resolve('style-loader'),
+          {
+            loader: require.resolve('css-loader'),
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: require.resolve('postcss-loader'),
+            options: {
+              ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
+              plugins: () => [
+                require('postcss-flexbugs-fixes'),
+                autoprefixer({
+                  browsers: [
+                    '>1%',
+                    'last 4 versions',
+                    'Firefox ESR',
+                    'not ie < 9', // React doesn't support IE8 anyway
+                  ],
+                  flexbox: 'no-2009',
+                }),
+              ],
+            },
+          },
+        ],
+      },
+      {
+        test: /\.less$/,
+        use : [
+          'style-loader',
+          'css-loader',
+          'less-loader',
+        ],
       }
     ]
   }

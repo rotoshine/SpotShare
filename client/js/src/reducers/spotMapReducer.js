@@ -19,10 +19,7 @@ function spotMap(state = initialSpotsState, action) {
     case RECEIVE_MAP_SPOTS:
       return _.assign({}, state, {
         nowLoading: false,
-        spots: action.spots,
-        totalCount: action.totalCount,
-        page: action.page,
-        limit: action.limit
+        spots: action.spots
       });
     default:
       return state;

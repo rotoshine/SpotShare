@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-
+import {Link} from 'react-router-dom';
 import {Modal} from 'react-bootstrap';
 
 import SpotDetail from '../detail/SpotDetail';
@@ -54,7 +54,7 @@ export default class SpotDetailModal extends React.Component {
                       onRemoveComment={onRemoveComment}/>
         </Modal.Body>
         <Modal.Footer>
-          test
+          <Link to={`/spots/${spot._id}`}>자세히 보기</Link>
         </Modal.Footer>
       </Modal>
     );

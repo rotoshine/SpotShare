@@ -1,14 +1,13 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Navbar, Nav, NavItem} from 'react-bootstrap';
-import { Switch, Route, Link, withRouter } from 'react-router-dom';
-import RouteNavItem from './components/RouterNavItem';
+import { Layout, Menu } from 'antd';
+import { Switch, Route, withRouter } from 'react-router-dom';
 import SpotMapContainer from './containers/SpotMapContainer';
 import SpotListContainer from './containers/SpotListContainer';
 import SpotDetailContainer from './containers/SpotDetailContainer';
 import SpotFormContainer from './containers/SpotFormContainer';
 import NotFoundContainer from './containers/errors/NotFoundContainer';
-
+const { Header, Content } = Layout;
 /**
  * App Component
  */
@@ -20,9 +19,9 @@ class App extends React.Component {
     children: PropTypes.oneOfType([ PropTypes.element, PropTypes.array ])
   };
 
-  componentDidMount () {
-    window && window.$ && window.$.material.init();
-  }
+  state = {
+    selectedMenu: null
+  };
 
   renderLoginProviders () {
     const { user } = this.props;
@@ -38,10 +37,10 @@ class App extends React.Component {
       let authButtons = [];
       this.props.providers.forEach((provider, i) => {
         authButtons.push(
-          <NavItem eventKey={i} key={i} href={`/auth/${provider}/login`}
-                   className={`btn-raised auth-button-${provider}`}>
+          <Link eventKey={i} key={i} href={`/auth/${provider}/login`}
+                className={`btn-raised auth-button-${provider}`}>
             <i className={`fa fa-${provider}`}/> Login
-          </NavItem>
+          </Link>
         );
       });
 
@@ -50,6 +49,23 @@ class App extends React.Component {
 
   }
 
+  handleMenuClick = (e) => {
+    const { dispatch, location } = this.props;
+    if ( location.pathname !== '/spots' ) {
+      dispatch({
+        type: 'RESET_LOADED_SPOTS'
+      });
+    } else {
+      e.preventDefault();
+    }
+
+    this.setState({
+      selectedMenu: e.key
+    }, () => {
+      this.props.history.push(`/${e.key}`);
+    });
+  };
+
   render () {
     const { user } = this.props;
 
@@ -57,41 +73,30 @@ class App extends React.Component {
 
     if ( user.isLogin ) {
       userComponent = (
-        <NavItem>
-          <span className="label label-info">Hello <i className={`fa fa-${user.provider}`}/>{user.name}!</span>
-        </NavItem>
+        <span className="label label-info">Hello <i className={`fa fa-${user.provider}`}/>{user.name}!</span>
       );
     }
 
     return (
-      <section style={{ width: '100%', height: '100%' }}>
-        <Navbar style={{ marginBottom: 0 }} inverse>
-          <Navbar.Header>
-            <Navbar.Brand>
-              <Link to="/">{this.props.defaultTitle}</Link>
-            </Navbar.Brand>
-            <Navbar.Toggle />
-          </Navbar.Header>
-          <Navbar.Collapse>
-            <Nav>
-                <RouteNavItem eventKey={1} to="/map">Spot Map</RouteNavItem>
-                <RouteNavItem eventKey={2} to="/spots" onClick={this.handleSpotListMenuClick}>Spot List</RouteNavItem>
-            </Nav>
-            <Nav pullRight>
-              {userComponent}
-              {this.renderLoginProviders()}
-            </Nav>
-          </Navbar.Collapse>
-        </Navbar>
-        <Switch>
-          <Route path="/" exact component={SpotMapContainer}/>
-          <Route path="/map" exact component={SpotMapContainer}/>
-          <Route path="/spots" exact strict component={SpotListContainer}/>
-          <Route path="/spots/:spotId" exact strict component={SpotDetailContainer}/>
-          <Route path="/spots/:spotId/form" exact strict component={SpotFormContainer}/>
-          <Route component={NotFoundContainer}/>
-        </Switch>
-      </section>
+      <Layout style={{ width: '100%', height: '100%' }}>
+        <Header>
+          <Menu selectedKeys={[ this.state.selectedMenu ]} mode="horizontal" onClick={this.handleMenuClick}>
+            <Menu.Item key="map">Map</Menu.Item>
+            <Menu.Item key="spots">List</Menu.Item>
+            {userComponent}
+          </Menu>
+        </Header>
+        <Content>
+          <Switch>
+            <Route path="/" exact component={SpotMapContainer}/>
+            <Route path="/map" exact component={SpotMapContainer}/>
+            <Route path="/spots" exact strict component={SpotListContainer}/>
+            <Route path="/spots/:spotId" exact strict component={SpotDetailContainer}/>
+            <Route path="/spots/:spotId/form" exact strict component={SpotFormContainer}/>
+            <Route component={NotFoundContainer}/>
+          </Switch>
+        </Content>
+      </Layout>
     );
   }
 

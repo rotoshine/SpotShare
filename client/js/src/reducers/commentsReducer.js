@@ -13,7 +13,7 @@ function comments(state = initialState, action) {
       return _.assign({}, state, {
         nowLoading: true
       });
-    case CommentAction.RECIEVE_COMMENTS:
+    case CommentAction.RECEIVE_COMMENTS:
       return _.assign([], state, {
         nowLoading: false,
         comments: action.comments
